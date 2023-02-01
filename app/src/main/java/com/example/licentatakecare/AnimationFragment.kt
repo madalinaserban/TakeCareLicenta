@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 
 class AnimationFragment : Fragment() {
     override fun onCreateView(
@@ -16,13 +17,13 @@ class AnimationFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_animation, container, false)
         Handler(Looper.myLooper()!!).postDelayed({
+          //  if (context?.let { SharedPrefsUtils.getAccessToken(it) } == null) {
+                findNavController().navigate(R.id.action_animationFragment_to_logFragment)
+           // } else {
+           //     findNavController().navigate(R.id.action_animationFragment_to_loginFragment)
+           // }
         }, 4000)
         return view
     }
 
-    private fun onBoardingFinished(): Boolean {
-        val sharedPref = requireActivity().getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-        return sharedPref.getBoolean("Finished", false)
-
-    }
 }
