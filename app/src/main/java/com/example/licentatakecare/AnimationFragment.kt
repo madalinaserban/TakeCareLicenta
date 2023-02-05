@@ -18,7 +18,7 @@ class AnimationFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_animation, container, false)
         Handler(Looper.myLooper()!!).postDelayed({
           //  if (context?.let { SharedPrefsUtils.getAccessToken(it) } == null) {
-                findNavController().navigate(R.id.action_animationFragment_to_logFragment)
+                findNavController().navigate(R.id.action_animationFragment_to_loginFragment)
            // } else {
            //     findNavController().navigate(R.id.action_animationFragment_to_loginFragment)
            // }

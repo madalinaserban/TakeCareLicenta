@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "168121971877",
+    "firebase_url": "https://licentatakecare-default-rtdb.firebaseio.com",
+    "project_id": "licentatakecare",
+    "storage_bucket": "licentatakecare.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:168121971877:android:10ea35a7f71551313d094c",
+        "android_client_info": {
+          "package_name": "com.example.licentatakecare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "168121971877-f89vjqkir2dsvisabdngqr65n5km6ijc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyihYCNnZxpinfUowG5dGVZ_fZeUVhjVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "168121971877-f89vjqkir2dsvisabdngqr65n5km6ijc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
