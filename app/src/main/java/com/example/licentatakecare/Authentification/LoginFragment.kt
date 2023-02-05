@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
+import androidx.navigation.findNavController
+import com.example.licentatakecare.R
 import com.example.licentatakecare.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 
@@ -18,7 +20,6 @@ class LoginFragment : Fragment() {
     private lateinit var signInInputsArray: Array<EditText>
     private lateinit var firebaseAuth:FirebaseAuth
     private lateinit var checkBox: CheckBox
-   // private lateinit var authViewModel:AuthentificationViewModel
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?,
                                savedInstanceState: Bundle?
     ): View? {
@@ -29,7 +30,6 @@ class LoginFragment : Fragment() {
         signInInputsArray= arrayOf(binding.signEmail,binding.signPassword)
         binding.btnSignIn.setOnClickListener{
             signInUser()
-            // Toast.makeText(activity, "Buna 1:)", Toast.LENGTH_SHORT).show()
         }
 
         binding.btnCreateAccount.setOnClickListener{
@@ -58,7 +58,7 @@ class LoginFragment : Fragment() {
                         }
                         val user = firebaseAuth.currentUser
                         Toast.makeText(activity, "Sign in successful", Toast.LENGTH_SHORT).show()
-                        //view?.findNavController()?.navigate(R.id.action_signInFragment_to_profileFragment)
+                        view?.findNavController()?.navigate(R.id.action_loginFragment_to_profileFragment)
 
                     } else {
                         Toast.makeText(activity, ":(", Toast.LENGTH_SHORT).show()
