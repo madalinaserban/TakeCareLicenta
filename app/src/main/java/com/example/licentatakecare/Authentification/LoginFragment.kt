@@ -32,10 +32,10 @@ class LoginFragment : Fragment() {
             signInUser()
         }
 
-        binding.btnCreateAccount.setOnClickListener{
+        //binding.btnCreateAccount.setOnClickListener{
           //  view?.findNavController()?.navigate(R.id.action_signInFragment_to_signUpFragment)
             // Toast.makeText(activity,"Click merge",Toast.LENGTH_SHORT).show()
-        }
+        //}
         return binding.root
     }
     override fun onStart() {
