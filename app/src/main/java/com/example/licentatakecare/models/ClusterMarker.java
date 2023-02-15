@@ -1,8 +1,9 @@
-package com.example.licentatakecare;
+package com.example.licentatakecare.models;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.licentatakecare.Hospital;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
@@ -11,9 +12,9 @@ public class ClusterMarker implements ClusterItem{
  private String title;
  private String snippet;
  private int icon;
- private Hospital hospital;
+ private com.example.licentatakecare.Hospital hospital;
 
-    public ClusterMarker(LatLng position, String title, String snippet, int icon, Hospital hospital) {
+    public ClusterMarker(LatLng position, String title, String snippet, int icon, com.example.licentatakecare.Hospital hospital) {
         this.position = position;
         this.title = title;
         this.snippet = snippet;
@@ -63,7 +64,7 @@ public class ClusterMarker implements ClusterItem{
         this.icon = icon;
     }
 
-    public Hospital getHospital() {
+    public com.example.licentatakecare.Hospital getHospital() {
         return hospital;
     }
 
