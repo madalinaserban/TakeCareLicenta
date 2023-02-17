@@ -5,6 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".map.MapsActivity">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <androidx.fragment.app.FragmentContainerView
         android:layout_width="match_parent"
@@ -17,5 +21,6 @@
         app:layout_constraintEnd_toEndOf="parent">
 
     </androidx.fragment.app.FragmentContainerView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

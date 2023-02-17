@@ -7,69 +7,35 @@ import com.example.licentatakecare.Hospital;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
-public class ClusterMarker implements ClusterItem{
- private LatLng position;
- private String title;
- private String snippet;
- private int icon;
- private com.example.licentatakecare.Hospital hospital;
+public class ClusterMarker implements ClusterItem {
 
-    public ClusterMarker(LatLng position, String title, String snippet, int icon, com.example.licentatakecare.Hospital hospital) {
-        this.position = position;
-        this.title = title;
-        this.snippet = snippet;
-        this.icon = icon;
-        this.hospital = hospital;
+    private final LatLng mPosition;
+    private final String mTitle;
+    private final String mSnippet;
+    private final int mNumAvailablePlaces;
+
+    public ClusterMarker(double lat, double lng, String title, String snippet, int numAvailablePlaces) {
+        mPosition = new LatLng(lat, lng);
+        mTitle = title;
+        mSnippet = snippet;
+        mNumAvailablePlaces = numAvailablePlaces;
     }
 
-    public ClusterMarker() {
-
-    }
-
-    @NonNull
     @Override
     public LatLng getPosition() {
-        return position;
+        return mPosition;
     }
 
-    public void setPosition(LatLng position) {
-        this.position = position;
-    }
-
-    @Nullable
-    @Override
     public String getTitle() {
-        return title;
+        return mTitle;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    @Nullable
-    @Override
     public String getSnippet() {
-        return snippet;
+        return mSnippet;
     }
 
-    public void setSnippet(String snippet) {
-        this.snippet = snippet;
-    }
-
-    public int getIcon() {
-        return icon;
-    }
-
-    public void setIcon(int icon) {
-        this.icon = icon;
-    }
-
-    public com.example.licentatakecare.Hospital getHospital() {
-        return hospital;
-    }
-
-    public void setHospital(Hospital hospital) {
-        this.hospital = hospital;
+    public int getNumAvailablePlaces() {
+        return mNumAvailablePlaces;
     }
 }
 
