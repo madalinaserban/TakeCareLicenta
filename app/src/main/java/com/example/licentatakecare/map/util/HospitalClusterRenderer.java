@@ -1,4 +1,4 @@
-package com.example.licentatakecare.util;
+package com.example.licentatakecare.map.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,13 +6,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 
-import com.airbnb.lottie.utils.Utils;
 import com.amulyakhare.textdrawable.TextDrawable;
-import com.example.licentatakecare.models.ClusterMarker;
+import com.example.licentatakecare.map.models.ClusterMarker;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
@@ -41,7 +39,7 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         super.onClusterItemRendered(clusterItem, marker);
 
         // If the number of available places is greater than 0, display it in a text overlay
-        if (clusterItem.getNumAvailablePlaces() > -1) {
+        if (clusterItem.getNumAvailablePlaces() > 0) {
             TextPaint textPaint = new TextPaint();
             textPaint.setColor(Color.WHITE);
             textPaint.setTypeface(Typeface.DEFAULT_BOLD);
@@ -72,5 +70,11 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         return bitmap;
     }
 
+    public void updateMarker(ClusterMarker clusterMarker, int numAvailablePlaces) {
+        clusterMarker.setmNumAvailablePlaces(numAvailablePlaces);
+        Marker marker = getMarker(clusterMarker);
+        if (marker != null) {
+            onClusterItemRendered(clusterMarker, marker);
+        }
+    }
 }
-

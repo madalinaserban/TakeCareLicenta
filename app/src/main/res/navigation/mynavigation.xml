@@ -35,7 +35,7 @@
         tools:layout="@layout/fragment_log_list" />
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.example.licentatakecare.ProfileFragment"
+        android:name="com.example.licentatakecare.Authentification.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
 </navigation>

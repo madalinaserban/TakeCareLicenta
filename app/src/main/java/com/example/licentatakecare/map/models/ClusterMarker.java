@@ -1,9 +1,5 @@
-package com.example.licentatakecare.models;
+package com.example.licentatakecare.map.models;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.example.licentatakecare.Hospital;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
@@ -11,15 +7,27 @@ public class ClusterMarker implements ClusterItem {
 
     private final LatLng mPosition;
     private final String mTitle;
-    private final String mSnippet;
-    private final int mNumAvailablePlaces;
+    private String mSnippet;
 
-    public ClusterMarker(double lat, double lng, String title, String snippet, int numAvailablePlaces) {
+    public void setmNumAvailablePlaces(int mNumAvailablePlaces) {
+        this.mNumAvailablePlaces = mNumAvailablePlaces;
+    }
+
+    private  int mNumAvailablePlaces;
+
+    public ClusterMarker(double lat, double lng, String title, String snippet,int numAvailablePlaces) {
         mPosition = new LatLng(lat, lng);
         mTitle = title;
         mSnippet = snippet;
         mNumAvailablePlaces = numAvailablePlaces;
+   }
+
+
+
+    public void setSnippet(String mSnippet) {
+        this.mSnippet = mSnippet;
     }
+
 
     @Override
     public LatLng getPosition() {
@@ -37,5 +45,7 @@ public class ClusterMarker implements ClusterItem {
     public int getNumAvailablePlaces() {
         return mNumAvailablePlaces;
     }
+
+
 }
 

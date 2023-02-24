@@ -1,22 +1,28 @@
 package com.example.licentatakecare.map;
 
-import static com.example.licentatakecare.models.Hospital.getHospitalList;
+import static com.example.licentatakecare.map.util.Section.ALL;
+import static com.example.licentatakecare.map.util.Section.RADIOLOGY;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.licentatakecare.R;
-import com.example.licentatakecare.models.ClusterMarker;
-import com.example.licentatakecare.models.Hospital;
-import com.example.licentatakecare.util.HospitalClusterRenderer;
+import com.example.licentatakecare.map.models.ClusterMarker;
+import com.example.licentatakecare.map.models.Hospital;
+import com.example.licentatakecare.map.util.HospitalClusterRenderer;
+import com.example.licentatakecare.map.util.HospitalsCallback;
+import com.example.licentatakecare.map.util.Section;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,7 +30,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -43,11 +48,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseFirestore db;
     private List<Hospital> hospitals = new ArrayList<>();
     private ClusterManager<ClusterMarker> mClusterManager;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private HospitalClusterRenderer mHospitalClusterRenderer;
+    private Section section=ALL;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getSupportActionBar().hide();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
@@ -55,16 +62,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         db = FirebaseFirestore.getInstance();
         fusedClient = LocationServices.getFusedLocationProviderClient(this);
         getLocation();
-        //code to refresh
-        // Initialize the SwipeRefreshLayout
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        Button radiologyButton = findViewById(R.id.button_radiology);
+        radiologyButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onRefresh() {
-                // Reload the map
-                swipeRefreshLayout.setRefreshing(false);
+            public void onClick(View v) {
+                section=RADIOLOGY;
+                mClusterManager.clearItems();
+                addHospitalsToMap(hospitals,section);
+              Toast.makeText(getApplicationContext(),"Radiologie",Toast.LENGTH_SHORT).show();
+
             }
         });
+
+
     }
 
     private void getLocation() {
@@ -90,9 +100,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        mGoogleMap=googleMap;
+        mGoogleMap = googleMap;
         mClusterManager = new ClusterManager<>(this, googleMap);
-        mClusterManager.setRenderer(new HospitalClusterRenderer(this, googleMap, mClusterManager));
+        mClusterManager.setRenderer(new HospitalClusterRenderer(this, mGoogleMap, mClusterManager));
+        mHospitalClusterRenderer = new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager);
+
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -116,21 +128,38 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onHospitalsRetrieved(List<Hospital> hospitals) {
                 Log.d("MapsActivity", "Hospitals retrieved: " + hospitals.size());
-                addHospitalsToMap(hospitals);
+                addHospitalsToMap(hospitals, ALL);
                 // Display clusters on map
                 mClusterManager.cluster();
+
             }
         });
+
     }
 
 
-    public void addHospitalsToMap(List<Hospital> hospitals) {
+    public void addHospitalsToMap(List<Hospital> hospitals,Section section) {
+        int title_number=0;
         for (Hospital hospital : hospitals) {
-//            LatLng hospitalLatLng = new LatLng(hospital.getGeoPoint().getLatitude(), hospital.getGeoPoint().getLongitude());
-//            MarkerOptions markerOptions = new MarkerOptions().position(hospitalLatLng).title(hospital.getName());
-//            mGoogleMap.addMarker(markerOptions);
-            ClusterMarker marker = new ClusterMarker(hospital.getGeoPoint().getLatitude(), hospital.getGeoPoint().getLongitude(), hospital.getName(), null,hospital.getEmpty_spots());
+            int emptySpots = hospital.getEmpty_spots();
+            int radiologySpots = hospital.getRadiology();
+            int emergencySpots = hospital.getEmergency();
+            int cardiologySpots = hospital.getCardiology();
+            switch (section)
+            {
+                case ALL:title_number=emptySpots;
+                case RADIOLOGY:title_number=radiologySpots;
+                case EMERGENCY:title_number=emergencySpots;
+                case CARDIOLOGY:title_number=cardiologySpots;
+                default:title_number=emptySpots;
+                break;
+            }
+            ClusterMarker marker = new ClusterMarker(hospital.getGeoPoint().getLatitude(), hospital.getGeoPoint().getLongitude(), hospital.getName(), null, title_number);
+            String snippet = "Available spots: " + emptySpots + "\nRadiology: " + radiologySpots + "\nEmergency: " + emergencySpots + "\nCardiology: " + cardiologySpots;
+            marker.setSnippet(snippet);
             mClusterManager.addItem(marker);
+            mClusterManager.cluster();
+
 
         }
     }
@@ -144,5 +173,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 getLocation();
         }
     }
+    public Hospital getHospitalFromMarker(ClusterMarker marker) {
+        for (Hospital hospital : hospitals) {
+            if (hospital.getGeoPoint().getLatitude() == marker.getPosition().latitude &&
+                    hospital.getGeoPoint().getLongitude() == marker.getPosition().longitude) {
+                return hospital;
+            }
+        }
+        return null;
+    }
+
 
 }
