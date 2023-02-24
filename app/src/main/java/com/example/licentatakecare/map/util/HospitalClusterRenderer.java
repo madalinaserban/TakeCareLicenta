@@ -32,7 +32,8 @@ import java.util.Map;
 public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarker> {
     private final Context mContext;
     private List<Hospital> hospitals = new ArrayList<>();
-    private Section mSection=Section.ALL;
+    private Section mSection = Section.ALL;
+    private Map<ClusterMarker, Marker> mapClusterMarker = new HashMap<>();
 
     public HospitalClusterRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager) {
         super(context, map, clusterManager);
@@ -53,6 +54,7 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
 
         // If the number of available places is greater than 0, display it in a text overlay
         if (clusterItem.getNumAvailablePlaces() > 0) {
+            mapClusterMarker.put(clusterItem, marker);
             marker.setIcon(getMarkerIcon(clusterItem));
         }
     }
@@ -65,23 +67,23 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         return bitmap;
     }
 
-    public void updateMarker(Section section, HashMap<ClusterMarker,Hospital> markers,ClusterManager<ClusterMarker> mClusterManager) {
-        for (Map.Entry<ClusterMarker, Hospital> entry : markers.entrySet()) {
-            ClusterMarker clusterMarker = entry.getKey();
-            Hospital hospital = entry.getValue();
-            mSection=section;
+    public void updateMarker(Section section, List<ClusterMarker> markers, ClusterManager<ClusterMarker> mClusterManager) {
+        for (ClusterMarker clusterMarker : markers) {
+            Hospital hospital = clusterMarker.getHospital();
+            mSection = section;
+            Marker marker;
             int numAvailablePlaces = hospital.getNumAvailablePlaces(section);
             clusterMarker.setmNumAvailablePlaces(numAvailablePlaces);
-            Marker marker = getMarker(clusterMarker);
-            if (marker != null) {
+            for (Map.Entry<ClusterMarker, Marker> map : mapClusterMarker.entrySet()) {
+                if (map.getKey() == clusterMarker) {
+                marker=map.getValue();
                 marker.setIcon(getMarkerIcon(clusterMarker));
+                }
             }
         }
         mClusterManager.cluster();
     }
-    public void updateSection(Section section) {
-        mSection = section;
-    }
+
     private BitmapDescriptor getMarkerIcon(ClusterMarker clusterMarker) {
         TextDrawable drawable = TextDrawable.builder()
                 .beginConfig()
@@ -90,7 +92,7 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
                 .fontSize(50)
                 .bold()
                 .endConfig()
-                .buildRound(Integer.toString(clusterMarker.getNumAvailablePlaces()), getMarkerColor(clusterMarker));
+                .buildRound(Integer.toString(clusterMarker.getNumAvailablePlaces()), getMarkerColor());
         int width = drawable.getIntrinsicWidth() + 130;
         int height = drawable.getIntrinsicHeight() + 130;
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -101,9 +103,7 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
     }
 
 
-
-
-    private int getMarkerColor(ClusterMarker clusterItem) {
+    private int getMarkerColor() {
         int color = ContextCompat.getColor(mContext, R.color.btn_all); // default color
         switch (mSection) {
             case EMERGENCY:
@@ -121,7 +121,6 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         }
         return color;
     }
-
 
 
 }

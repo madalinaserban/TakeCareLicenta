@@ -57,7 +57,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private HospitalClusterRenderer mHospitalClusterRenderer;
     private Section mSection = ALL;
     private ActivityMapsBinding binding;
-    private HashMap mMarkerMap = new HashMap<>();
+    private List<ClusterMarker> mClusterMarkers=new ArrayList<>();
 
 
     @Override
@@ -104,7 +104,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d("RadioGroup", mSection.toString());
                 break;
         }
-        mHospitalClusterRenderer.updateMarker(mSection, mMarkerMap, mClusterManager);
+        mHospitalClusterRenderer.updateMarker(mSection,mClusterMarkers, mClusterManager);
     }
 
 
@@ -161,7 +161,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         for (Hospital hospital : hospitals) {
 
             ClusterMarker marker = new ClusterMarker(hospital, hospital.getNumAvailablePlaces(ALL));
-            mMarkerMap.put(marker, hospital);
+            mClusterMarkers.add(marker);
             mClusterManager.addItem(marker);
             mClusterManager.cluster();
 
@@ -177,16 +177,4 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 getLocation();
         }
     }
-
-    public Hospital getHospitalFromMarker(ClusterMarker marker) {
-        for (Hospital hospital : mHospitals) {
-            if (hospital.getGeoPoint().getLatitude() == marker.getPosition().latitude &&
-                    hospital.getGeoPoint().getLongitude() == marker.getPosition().longitude) {
-                return hospital;
-            }
-        }
-        return null;
-    }
-
-
 }
