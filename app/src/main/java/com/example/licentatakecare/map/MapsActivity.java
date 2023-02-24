@@ -104,7 +104,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d("RadioGroup", mSection.toString());
                 break;
         }
-        mHospitalClusterRenderer.updateMarker(mSection,mClusterMarkers, mClusterManager);
+        mHospitalClusterRenderer.updateMarker(mSection,mClusterMarkers);
     }
 
 

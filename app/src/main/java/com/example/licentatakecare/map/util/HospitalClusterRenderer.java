@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
+import android.util.Log;
 import android.util.Pair;
 
 import androidx.core.content.ContextCompat;
@@ -51,7 +52,8 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
     @Override
     protected void onClusterItemRendered(ClusterMarker clusterItem, Marker marker) {
         super.onClusterItemRendered(clusterItem, marker);
-
+        // Set the Marker as the marker property of the corresponding ClusterMarker
+        clusterItem.setMarker(marker);
         // If the number of available places is greater than 0, display it in a text overlay
         if (clusterItem.getNumAvailablePlaces() > 0) {
             mapClusterMarker.put(clusterItem, marker);
@@ -67,21 +69,19 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         return bitmap;
     }
 
-    public void updateMarker(Section section, List<ClusterMarker> markers, ClusterManager<ClusterMarker> mClusterManager) {
+    public void updateMarker(Section section, List<ClusterMarker> markers) {
         for (ClusterMarker clusterMarker : markers) {
             Hospital hospital = clusterMarker.getHospital();
             mSection = section;
-            Marker marker;
             int numAvailablePlaces = hospital.getNumAvailablePlaces(section);
             clusterMarker.setmNumAvailablePlaces(numAvailablePlaces);
-            for (Map.Entry<ClusterMarker, Marker> map : mapClusterMarker.entrySet()) {
-                if (map.getKey() == clusterMarker) {
-                marker=map.getValue();
+            Marker marker = clusterMarker.getMarker(); // get the Marker object from the ClusterMarker
+            if (marker != null) {
                 marker.setIcon(getMarkerIcon(clusterMarker));
-                }
+            } else {
+                Log.e("Marker update", "Marker not found for cluster marker");
             }
         }
-        mClusterManager.cluster();
     }
 
     private BitmapDescriptor getMarkerIcon(ClusterMarker clusterMarker) {
