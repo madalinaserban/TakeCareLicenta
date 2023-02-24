@@ -18,55 +18,59 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
+        <RadioGroup
+            android:id="@+id/radio_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="5dp">
-
-            <Button
-                android:id="@+id/button_radiology"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background = "@drawable/round_button"
-                app:backgroundTint="@null"
-                android:text="Radiology" />
-
-            <Button
-                android:id="@+id/button_emergency"
-                android:layout_width="wrap_content"
-                android:layout_marginStart="3dp"
-                android:layout_height="wrap_content"
-                android:background = "@drawable/round_button"
-                app:backgroundTint="@null"
-                android:text="Emergency" />
-
-            <Button
-                android:id="@+id/button_cardiology"
-                android:layout_width="wrap_content"
-                android:layout_marginStart="3dp"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@null"
-                android:background = "@drawable/round_button"
-                android:text="Cardiology" />
-            <Button
+            <RadioButton
                 android:id="@+id/button_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:backgroundTint="@null"
-                android:layout_marginStart="3dp"
+                app:backgroundTint="#33539E"
+                android:layout_marginStart="5dp"
                 android:background = "@drawable/round_button"
-                android:text="All" />
-            <Button
-                android:id="@+id/button_random"
+                android:text="All"
+                />
+
+            <RadioButton
+                android:id="@+id/button_radiology"
                 android:layout_width="wrap_content"
-                android:layout_marginStart="3dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background = "@drawable/round_button"
+                app:backgroundTint="#7FACD6"
+                android:text="Radiology" />
+
+            <RadioButton
+                android:id="@+id/button_emergency"
+                android:layout_width="wrap_content"
+                android:layout_marginStart="5dp"
                 android:layout_height="wrap_content"
                 android:background = "@drawable/round_button"
-                app:backgroundTint="@null"
+                app:backgroundTint="#BFB8DA"
+                android:text="Emergency" />
+
+            <RadioButton
+                android:id="@+id/button_cardiology"
+                android:layout_width="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_height="wrap_content"
+                app:backgroundTint="#E8B7D4"
+                android:background = "@drawable/round_button"
                 android:text="Cardiology" />
+
+            <RadioButton
+                android:id="@+id/button_random"
+                android:layout_width="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_height="wrap_content"
+                android:background = "@drawable/round_button"
+                app:backgroundTint="#A5678E"
+                android:text="TO DO" />
             <!-- Add more buttons as needed -->
-        </LinearLayout>
+        </RadioGroup>
     </HorizontalScrollView>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -8,6 +8,20 @@ public class ClusterMarker implements ClusterItem {
     private final LatLng mPosition;
     private final String mTitle;
     private String mSnippet;
+    private Hospital mHospital;
+    private int mColor;
+
+    public Hospital getHospital() {
+        return mHospital;
+    }
+
+    public void setHospital(Hospital hospital) {
+        this.mHospital = hospital;
+    }
+    public void setColor(int color) {
+        mColor = color;
+    }
+
 
     public void setmNumAvailablePlaces(int mNumAvailablePlaces) {
         this.mNumAvailablePlaces = mNumAvailablePlaces;
@@ -15,13 +29,18 @@ public class ClusterMarker implements ClusterItem {
 
     private  int mNumAvailablePlaces;
 
-    public ClusterMarker(double lat, double lng, String title, String snippet,int numAvailablePlaces) {
-        mPosition = new LatLng(lat, lng);
-        mTitle = title;
-        mSnippet = snippet;
+    public ClusterMarker(Hospital hospital,int numAvailablePlaces) {
+        mPosition = new LatLng(hospital.getGeoPoint().getLatitude(), hospital.getGeoPoint().getLongitude());
+        mTitle = hospital.getName();
+        mSnippet = "";
         mNumAvailablePlaces = numAvailablePlaces;
+        mHospital=hospital;
+
    }
 
+    public int getColor() {
+        return mColor;
+    }
 
 
     public void setSnippet(String mSnippet) {

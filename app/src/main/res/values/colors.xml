@@ -13,10 +13,14 @@
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
     <color name="cream">#f2d8b3</color>
-        <color name="deep_blue">#001B48</color>
-        <color name="dark_blue">#02457A</color>
-        <color name="blue">#018abe</color>
-        <color name="pastel_blue">#97CADB</color>
-        <color name="light_blue">#d6e8ee</color>
-    <color name="nude">#dfcac3</color>
-    </resources>
+    <color name="deep_blue">#001B48</color>
+    <color name="dark_blue">#02457A</color>
+    <color name="blue">#018abe</color>
+    <color name="pastel_blue">#97CADB</color>
+    <color name="light_blue">#d6e8ee</color>
+    <color name="btn_all">#33539E</color>
+    <color name="btn_radiology">#7FACD6</color>
+    <color name="btn_emergency">#BFB8DA</color>
+    <color name="btn_cardiology">#E8B7D4</color>
+    <color name="nude">#e3bc9a</color>
+</resources>

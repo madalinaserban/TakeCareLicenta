@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.licentatakecare.map.util.HospitalsCallback;
+import com.example.licentatakecare.map.util.Section;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -80,7 +81,7 @@ public class Hospital {
     }
 
     public int getEmpty_spots() {
-        return empty_spots;
+        return cardiology+emergency+radiology;
     }
 
     public void setEmpty_spots(int empty_spots) {
@@ -110,4 +111,19 @@ public class Hospital {
             }
         });
     }
+    public int getNumAvailablePlaces(Section section) {
+        switch (section) {
+            case EMERGENCY:
+                return emergency;
+            case RADIOLOGY:
+                return radiology;
+            case CARDIOLOGY:
+                return cardiology;
+            case ALL:
+                return emergency + radiology + cardiology;
+            default:
+                return 0;
+        }
+    }
+
 }

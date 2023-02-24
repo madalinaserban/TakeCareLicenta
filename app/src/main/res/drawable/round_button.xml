@@ -14,7 +14,7 @@
                 android:top="4dp" />
         </shape>
     </item>
-    <item android:state_pressed="true">
+    <item android:state_selected="true">
         <shape android:shape="rectangle">
             <corners android:radius="1000dp" />
             <solid android:color="@color/deep_blue" />

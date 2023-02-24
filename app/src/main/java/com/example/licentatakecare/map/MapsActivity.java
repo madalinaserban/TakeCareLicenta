@@ -1,6 +1,8 @@
 package com.example.licentatakecare.map;
 
 import static com.example.licentatakecare.map.util.Section.ALL;
+import static com.example.licentatakecare.map.util.Section.CARDIOLOGY;
+import static com.example.licentatakecare.map.util.Section.EMERGENCY;
 import static com.example.licentatakecare.map.util.Section.RADIOLOGY;
 
 import androidx.annotation.NonNull;
@@ -15,9 +17,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.example.licentatakecare.R;
+import com.example.licentatakecare.databinding.ActivityMapsBinding;
 import com.example.licentatakecare.map.models.ClusterMarker;
 import com.example.licentatakecare.map.models.Hospital;
 import com.example.licentatakecare.map.util.HospitalClusterRenderer;
@@ -30,6 +34,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -37,45 +42,71 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, RadioGroup.OnCheckedChangeListener {
 
     private static final int REQUEST_CODE = 101;
     private GoogleMap mGoogleMap;
     private Location currentLocation;
     private FusedLocationProviderClient fusedClient;
     private FirebaseFirestore db;
-    private List<Hospital> hospitals = new ArrayList<>();
+    private List<Hospital> mHospitals = new ArrayList<>();
     private ClusterManager<ClusterMarker> mClusterManager;
     private HospitalClusterRenderer mHospitalClusterRenderer;
-    private Section section=ALL;
+    private Section mSection = ALL;
+    private ActivityMapsBinding binding;
+    private HashMap mMarkerMap = new HashMap<>();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getSupportActionBar().hide();
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        binding = ActivityMapsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        RadioGroup radioGroup = findViewById(R.id.radio_group);
+        radioGroup.setOnCheckedChangeListener(this);
+
 
         // Get database
         db = FirebaseFirestore.getInstance();
         fusedClient = LocationServices.getFusedLocationProviderClient(this);
         getLocation();
-        Button radiologyButton = findViewById(R.id.button_radiology);
-        radiologyButton.setOnClickListener(new View.OnClickListener() {
+        Hospital.getHospitalList(new HospitalsCallback() {
             @Override
-            public void onClick(View v) {
-                section=RADIOLOGY;
-                mClusterManager.clearItems();
-                addHospitalsToMap(hospitals,section);
-              Toast.makeText(getApplicationContext(),"Radiologie",Toast.LENGTH_SHORT).show();
-
+            public void onHospitalsRetrieved(List<Hospital> hospitals) {
+                mHospitals = hospitals;
+                addHospitalsToMap(mHospitals);
+                mClusterManager.cluster();
             }
         });
-
-
     }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        switch (checkedId) {
+            case R.id.button_radiology:
+                mSection = RADIOLOGY;
+                Log.d("RadioGroup", mSection.toString());
+                break;
+            case R.id.button_cardiology:
+                mSection=CARDIOLOGY;
+                Log.d("RadioGroup", mSection.toString());
+                break;
+            case R.id.button_emergency:
+                mSection=EMERGENCY;
+                Log.d("RadioGroup", mSection.toString());
+                break;
+            case R.id.button_all:
+                mSection=ALL;
+                Log.d("RadioGroup", mSection.toString());
+                break;
+        }
+        mHospitalClusterRenderer.updateMarker(mSection, mMarkerMap, mClusterManager);
+    }
+
 
     private void getLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -100,11 +131,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        Log.d("MapsActivity", "onMapReady");
         mGoogleMap = googleMap;
         mClusterManager = new ClusterManager<>(this, googleMap);
         mClusterManager.setRenderer(new HospitalClusterRenderer(this, mGoogleMap, mClusterManager));
         mHospitalClusterRenderer = new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager);
-
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -123,43 +154,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Assign the GoogleMap object to the member variable
         mGoogleMap = googleMap;
 
-        // Get the hospital locations from Firestore and add markers to the map
-        Hospital.getHospitalList(new HospitalsCallback() {
-            @Override
-            public void onHospitalsRetrieved(List<Hospital> hospitals) {
-                Log.d("MapsActivity", "Hospitals retrieved: " + hospitals.size());
-                addHospitalsToMap(hospitals, ALL);
-                // Display clusters on map
-                mClusterManager.cluster();
-
-            }
-        });
-
     }
 
 
-    public void addHospitalsToMap(List<Hospital> hospitals,Section section) {
-        int title_number=0;
+    public void addHospitalsToMap(List<Hospital> hospitals) {
         for (Hospital hospital : hospitals) {
-            int emptySpots = hospital.getEmpty_spots();
-            int radiologySpots = hospital.getRadiology();
-            int emergencySpots = hospital.getEmergency();
-            int cardiologySpots = hospital.getCardiology();
-            switch (section)
-            {
-                case ALL:title_number=emptySpots;
-                case RADIOLOGY:title_number=radiologySpots;
-                case EMERGENCY:title_number=emergencySpots;
-                case CARDIOLOGY:title_number=cardiologySpots;
-                default:title_number=emptySpots;
-                break;
-            }
-            ClusterMarker marker = new ClusterMarker(hospital.getGeoPoint().getLatitude(), hospital.getGeoPoint().getLongitude(), hospital.getName(), null, title_number);
-            String snippet = "Available spots: " + emptySpots + "\nRadiology: " + radiologySpots + "\nEmergency: " + emergencySpots + "\nCardiology: " + cardiologySpots;
-            marker.setSnippet(snippet);
+
+            ClusterMarker marker = new ClusterMarker(hospital, hospital.getNumAvailablePlaces(ALL));
+            mMarkerMap.put(marker, hospital);
             mClusterManager.addItem(marker);
             mClusterManager.cluster();
-
 
         }
     }
@@ -173,8 +177,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 getLocation();
         }
     }
+
     public Hospital getHospitalFromMarker(ClusterMarker marker) {
-        for (Hospital hospital : hospitals) {
+        for (Hospital hospital : mHospitals) {
             if (hospital.getGeoPoint().getLatitude() == marker.getPosition().latitude &&
                     hospital.getGeoPoint().getLongitude() == marker.getPosition().longitude) {
                 return hospital;
