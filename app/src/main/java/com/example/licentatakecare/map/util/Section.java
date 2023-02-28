@@ -1,6 +1,6 @@
 package com.example.licentatakecare.map.util;
 
-public enum ESection {
+public enum Section {
     EMERGENCY,
     RADIOLOGY,
     CARDIOLOGY,
