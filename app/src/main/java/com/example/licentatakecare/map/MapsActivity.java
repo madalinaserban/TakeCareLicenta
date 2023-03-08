@@ -1,11 +1,13 @@
 package com.example.licentatakecare.map;
 
-import static com.example.licentatakecare.map.util.Section.ALL;
-import static com.example.licentatakecare.map.util.Section.CARDIOLOGY;
-import static com.example.licentatakecare.map.util.Section.EMERGENCY;
-import static com.example.licentatakecare.map.util.Section.RADIOLOGY;
+import static android.content.ContentValues.TAG;
+import static com.example.licentatakecare.map.util.ESection.ALL;
+import static com.example.licentatakecare.map.util.ESection.CARDIOLOGY;
+import static com.example.licentatakecare.map.util.ESection.EMERGENCY;
+import static com.example.licentatakecare.map.util.ESection.RADIOLOGY;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -24,9 +26,9 @@ import com.example.licentatakecare.R;
 import com.example.licentatakecare.databinding.ActivityMapsBinding;
 import com.example.licentatakecare.map.models.ClusterMarker;
 import com.example.licentatakecare.map.models.Hospital;
+import com.example.licentatakecare.map.util.ESection;
 import com.example.licentatakecare.map.util.HospitalClusterRenderer;
 import com.example.licentatakecare.map.util.HospitalsCallback;
-import com.example.licentatakecare.map.util.Section;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,7 +40,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
@@ -55,7 +63,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private List<Hospital> mHospitals = new ArrayList<>();
     private ClusterManager<ClusterMarker> mClusterManager;
     private HospitalClusterRenderer mHospitalClusterRenderer;
-    private Section mSection = ALL;
+    private ESection mSection = ALL;
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers=new ArrayList<>();
 
@@ -69,7 +77,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         RadioGroup radioGroup = findViewById(R.id.radio_group);
         radioGroup.setOnCheckedChangeListener(this);
 
-
         // Get database
         db = FirebaseFirestore.getInstance();
         fusedClient = LocationServices.getFusedLocationProviderClient(this);
@@ -82,6 +89,53 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mClusterManager.cluster();
             }
         });
+//        db.collection("hospitals").addSnapshotListener(new EventListener<QuerySnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable QuerySnapshot snapshot,
+//                                @Nullable FirebaseFirestoreException e) {
+//                if (e != null) {
+//                    Log.w(TAG, "Listen failed.", e);
+//                    return;
+//                }
+//
+//                for (QueryDocumentSnapshot document : snapshot) {
+//                    String documentId = document.getId();
+//                    DocumentReference documentRef = db.collection("hospitals").document(documentId);
+//
+//                    // Add a listener to the document reference
+//                    documentRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//                        @Override
+//                        public void onEvent(@Nullable DocumentSnapshot snapshot,
+//                                            @Nullable FirebaseFirestoreException e) {
+//                            if (e != null) {
+//                                Log.w(TAG, "Listen failed.", e);
+//                                return;
+//                            }
+//
+//                            if (snapshot != null && snapshot.exists()) {
+//                                // Get the updated hospital object
+//                                Hospital updatedHospital = snapshot.toObject(Hospital.class);
+//
+//                                // Update the hospital in the list
+//                                for (int i = 0; i < mHospitals.size(); i++) {
+//                                    Hospital hospital = mHospitals.get(i);
+//                                    if (hospital.getId().equals(updatedHospital.getId())) {
+//                                        mHospitals.set(i, updatedHospital);
+//                                        break;
+//                                    }
+//                                }
+//
+//                                // Update the map
+//                                //addHospitalsToMap(mHospitals);
+//                             //   mClusterManager.cluster();
+//                                mHospitalClusterRenderer.updateMarker(mSection,mClusterMarkers);
+//                            }
+//                        }
+//                    });
+//                }
+//            }
+//        });
+
     }
 
     @Override

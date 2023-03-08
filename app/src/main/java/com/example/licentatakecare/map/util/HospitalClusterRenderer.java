@@ -4,12 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.text.TextPaint;
 import android.util.Log;
-import android.util.Pair;
 
 import androidx.core.content.ContextCompat;
 
@@ -26,15 +23,12 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarker> {
     private final Context mContext;
     private List<Hospital> hospitals = new ArrayList<>();
-    private Section mSection = Section.ALL;
-    private Map<ClusterMarker, Marker> mapClusterMarker = new HashMap<>();
+    private ESection mSection = ESection.ALL;
 
     public HospitalClusterRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager) {
         super(context, map, clusterManager);
@@ -56,7 +50,6 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         clusterItem.setMarker(marker);
         // If the number of available places is greater than 0, display it in a text overlay
         if (clusterItem.getNumAvailablePlaces() > 0) {
-            mapClusterMarker.put(clusterItem, marker);
             marker.setIcon(getMarkerIcon(clusterItem));
         }
     }
@@ -69,7 +62,7 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         return bitmap;
     }
 
-    public void updateMarker(Section section, List<ClusterMarker> markers) {
+    public void updateMarker(ESection section, List<ClusterMarker> markers) {
         for (ClusterMarker clusterMarker : markers) {
             Hospital hospital = clusterMarker.getHospital();
             mSection = section;
