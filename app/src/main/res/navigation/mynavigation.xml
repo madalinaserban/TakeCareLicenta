@@ -12,9 +12,7 @@
         <action
             android:id="@+id/action_animationFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
-        <action
-            android:id="@+id/action_animationFragment_to_logFragment"
-            app:destination="@id/logFragment" />
+
         <action
             android:id="@+id/action_animationFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
@@ -28,11 +26,6 @@
             android:id="@+id/action_loginFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/logFragment"
-        android:name="com.example.licentatakecare.log.LogFragment"
-        android:label="fragment_log_list"
-        tools:layout="@layout/fragment_log_list" />
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.licentatakecare.Authentification.ProfileFragment"

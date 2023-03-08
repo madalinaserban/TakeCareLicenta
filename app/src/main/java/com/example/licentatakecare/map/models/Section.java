@@ -1,13 +1,22 @@
 package com.example.licentatakecare.map.models;
 
-import com.example.licentatakecare.map.util.ESection;
 
-public class Section{
+public class Section {
+    private String id;
     private String name;
     private int availability;
     private int total_spaces;
 
-    public Section(){}
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Section() {
+    }
 
     public Section(String name, int availability, int total_spaces) {
         this.name = name;

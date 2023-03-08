@@ -54,19 +54,11 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         }
     }
 
-    private Bitmap drawableToBitmap(Drawable drawable, int width, int height) {
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
-    }
-
-    public void updateMarker(ESection section, List<ClusterMarker> markers) {
+    public void updateMarker(ESection esection,List<ClusterMarker> markers) {
         for (ClusterMarker clusterMarker : markers) {
             Hospital hospital = clusterMarker.getHospital();
-            mSection = section;
-            int numAvailablePlaces = hospital.getNumAvailablePlaces(section);
+             mSection = esection;
+            int numAvailablePlaces = hospital.getAvailability(mSection);
             clusterMarker.setmNumAvailablePlaces(numAvailablePlaces);
             Marker marker = clusterMarker.getMarker(); // get the Marker object from the ClusterMarker
             if (marker != null) {
