@@ -1,6 +1,5 @@
-package com.example.licentatakecare
+package com.example.licentatakecare.splashsceen
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -9,8 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
-import com.example.licentatakecare.Authentification.SharedPrefsUtils
+import com.example.licentatakecare.R
 import com.example.licentatakecare.map.MapsActivity
 
 class AnimationFragment : Fragment() {

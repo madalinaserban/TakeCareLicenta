@@ -77,4 +77,8 @@ dependencies {
 
     //For text drawable in cluster
     implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+
+    //Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
+
 }

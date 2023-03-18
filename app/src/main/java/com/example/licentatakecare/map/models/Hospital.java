@@ -8,8 +8,11 @@ import androidx.annotation.NonNull;
 
 import com.example.licentatakecare.map.util.HospitalsCallback;
 import com.example.licentatakecare.map.util.ESection;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
@@ -59,6 +62,58 @@ public class Hospital {
         this.geoPoint = geoPoint;
     }
 
+//    public static void getHospitalList(final HospitalsCallback callback) {
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        CollectionReference hospitalsRef = db.collection("hospitals");
+//
+//        hospitalsRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//            @Override
+//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                List<Hospital> hospitals = new ArrayList<>();
+//                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+//                    Hospital hospital = document.toObject(Hospital.class);
+//                    hospital.setId(document.getId());
+//                    // Get the subcollection sections for the current hospital
+//                    CollectionReference sectionsRef = hospitalsRef.document(document.getId()).collection("sections");
+//
+//                    // Retrieve the data from the subcollection sections
+//                    sectionsRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                        @Override
+//                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                            List<Section> sections = new ArrayList<>();
+//                            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+//                                Section section = document.toObject(Section.class);
+//                                section.setId(document.getId());
+//                                sections.add(section);
+//                            }
+//                            hospital.setSections(sections);
+//                            hospitals.add(hospital);
+//                            Log.d("Spitale",""+hospital.getName());
+//                            // Call the callback once all data has been retrieved
+//                            if (hospitals.size() == queryDocumentSnapshots.size()) {
+//                                callback.onHospitalsRetrieved(hospitals);
+//                            }
+//                        }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            Log.e(TAG, "Error getting sections for hospital " + document.getId(), e);
+//                            // If the operation fails, call the onHospitalsRetrieved method with an empty list
+//                            callback.onHospitalsRetrieved(new ArrayList<Hospital>());
+//                        }
+//                    });
+//                }
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.e(TAG, "Error getting hospital list", e);
+//                // If the operation fails, call the onHospitalsRetrieved method with an empty list
+//                callback.onHospitalsRetrieved(new ArrayList<Hospital>());
+//            }
+//        });
+//    }
+
     public static void getHospitalList(final HospitalsCallback callback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference hospitalsRef = db.collection("hospitals");
@@ -67,50 +122,56 @@ public class Hospital {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 List<Hospital> hospitals = new ArrayList<>();
+                List<Task<Void>> tasks = new ArrayList<>();
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                     Hospital hospital = document.toObject(Hospital.class);
                     hospital.setId(document.getId());
-
-                    // Get the subcollection sections for the current hospital
+                    // sections for the current hospital
                     CollectionReference sectionsRef = hospitalsRef.document(document.getId()).collection("sections");
 
-                    // Retrieve the data from the subcollection sections
-                    sectionsRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    Task<Void> task = sectionsRef.get().continueWith(new Continuation<QuerySnapshot, Void>() {
                         @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            List<Section> sections = new ArrayList<>();
-                            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                                Section section = document.toObject(Section.class);
-                                section.setId(document.getId());
-                                sections.add(section);
+                        public Void then(@NonNull Task<QuerySnapshot> task) throws Exception {
+                            if (task.isSuccessful()) {
+                                List<Section> sections = new ArrayList<>();
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Section section = document.toObject(Section.class);
+                                    section.setId(document.getId());
+                                    sections.add(section);
+                                }
+                                hospital.setSections(sections);
+                                hospitals.add(hospital);
+                                Log.d("Spitale",""+hospital.getName());
+                            } else {
+                                Log.e(TAG, "Error getting sections for hospital " + document.getId(), task.getException());
                             }
-                            hospital.setSections(sections);
-                            hospitals.add(hospital);
-
-                            // Call the callback once all data has been retrieved
-                            if (hospitals.size() == queryDocumentSnapshots.size()) {
-                                callback.onHospitalsRetrieved(hospitals);
-                            }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e(TAG, "Error getting sections for hospital " + document.getId(), e);
-                            // If the operation fails, call the onHospitalsRetrieved method with an empty list
-                            callback.onHospitalsRetrieved(new ArrayList<Hospital>());
+                            return null;
                         }
                     });
+                    tasks.add(task);
                 }
+                Tasks.whenAll(tasks).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        callback.onHospitalsRetrieved(hospitals);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Error getting sections for hospitals", e);
+                        callback.onHospitalsRetrieved(new ArrayList<Hospital>());
+                    }
+                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.e(TAG, "Error getting hospital list", e);
-                // If the operation fails, call the onHospitalsRetrieved method with an empty list
                 callback.onHospitalsRetrieved(new ArrayList<Hospital>());
             }
         });
     }
+
 
     public List<Section> getSections() {
         return sections;
@@ -122,9 +183,9 @@ public class Hospital {
 
     public int getAvailability(ESection eSection) {
         int availability = 0;
-        if (eSection.name() != "ALL") {
+        if (!(eSection.name().equals("ALL"))) {
             for (Section section : sections) {
-                if (section.getName() == eSection.toString())
+                if (section.getName().equals(eSection.toString()))
                     availability = section.getAvailability();
             }
         } else {

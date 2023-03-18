@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/animationFragment"
-        android:name="com.example.licentatakecare.AnimationFragment"
+        android:name="com.example.licentatakecare.splashsceen.AnimationFragment"
         android:label="AnimationFragment" >
         <action
             android:id="@+id/action_animationFragment_to_loginFragment"

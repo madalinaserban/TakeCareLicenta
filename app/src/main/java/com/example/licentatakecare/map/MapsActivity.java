@@ -37,7 +37,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, RadioGroup.OnCheckedChangeListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, RadioGroup.OnCheckedChangeListener,HospitalsCallback {
 
     private static final int REQUEST_CODE = 101;
     private GoogleMap mGoogleMap;
@@ -52,6 +52,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,20 +64,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         db = FirebaseFirestore.getInstance();
         fusedClient = LocationServices.getFusedLocationProviderClient(this);
         getLocation();
-        Hospital.getHospitalList(new HospitalsCallback() {
-            @Override
-            public void onHospitalsRetrieved(List<Hospital> hospitals) {
-                    mHospitals = hospitals;
-                    addHospitalsToMap(mHospitals);
-                    mClusterManager.cluster();
-
-                    // Initialize map
-                    SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.maps);
-                    assert supportMapFragment != null;
-                    supportMapFragment.getMapAsync(MapsActivity.this);
-
-            }
-        });
+        Hospital.getHospitalList(this);
     }
 
     @Override
@@ -119,8 +107,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             });
         }
     }
-
-
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         Log.d("MapsActivity", "onMapReady");
@@ -128,7 +114,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mClusterManager = new ClusterManager<>(this, googleMap);
         mClusterManager.setRenderer(new HospitalClusterRenderer(this, mGoogleMap, mClusterManager));
         mHospitalClusterRenderer = new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager);
-
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -142,23 +127,30 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
         googleMap.addMarker(markerOptions);
+        mClusterManager.cluster(); // cluster once at the end
 
         // Assign the GoogleMap object to the member variable
         mGoogleMap = googleMap;
-
     }
-
 
     public void addHospitalsToMap(List<Hospital> hospitals) {
         for (Hospital hospital : hospitals) {
-
             ClusterMarker marker = new ClusterMarker(hospital, hospital.getAvailability(ALL));
             mClusterMarkers.add(marker);
+            Log.d("Cluster add",""+marker.getTitle());
             mClusterManager.addItem(marker);
-            mClusterManager.cluster();
-
         }
+        mClusterManager.cluster(); // cluster once at the end
     }
+
+
+
+    public void onHospitalsRetrieved(List<Hospital> hospitals) {
+            mHospitals = hospitals;
+            addHospitalsToMap(mHospitals);
+        }
+
+
 
 
     @Override
