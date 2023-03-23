@@ -35,7 +35,7 @@ public class ClusterMarker implements ClusterItem {
     public ClusterMarker(Hospital hospital, int numAvailablePlaces) {
         mPosition = new LatLng(hospital.getGeoPoint().getLatitude(), hospital.getGeoPoint().getLongitude());
         mTitle = hospital.getName();
-        mSnippet = "";
+        mSnippet = hospital.getSections().toString();
         mNumAvailablePlaces = numAvailablePlaces;
         mHospital = hospital;
 

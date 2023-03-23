@@ -67,8 +67,8 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:2.5.3"
     implementation "androidx.navigation:navigation-ui-ktx:2.5.3"
     //google maps
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
-    implementation 'com.google.maps.android:android-maps-utils:2.3.0'
+    implementation 'com.google.android.gms:play-services-maps:18.0.0'
+    implementation 'com.google.maps.android:android-maps-utils:2.2.0'
     implementation 'com.google.maps.android:maps-utils-ktx:3.4.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
@@ -78,7 +78,8 @@ dependencies {
     //For text drawable in cluster
     implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 
-    //Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
-
+    //Directions
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.1'
 }
+

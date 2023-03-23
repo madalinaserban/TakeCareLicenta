@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.example.licentatakecare.R;
@@ -22,6 +23,7 @@ import com.example.licentatakecare.map.models.Hospital;
 import com.example.licentatakecare.map.util.ESection;
 import com.example.licentatakecare.map.util.HospitalClusterRenderer;
 import com.example.licentatakecare.map.util.HospitalsCallback;
+import com.example.licentatakecare.map.util.HospitalsDao;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,6 +43,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private static final int REQUEST_CODE = 101;
     private GoogleMap mGoogleMap;
+    private RadioButton btn_all;
     private Location currentLocation;
     private FusedLocationProviderClient fusedClient;
     private FirebaseFirestore db;
@@ -50,6 +53,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ESection mSection = ALL;
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
+    // Declare a boolean to keep track of whether the app is waiting for a permission
+    private boolean mWaitingForPermission = false;
+
+    // Declare a Bundle to save the state of the activity
+    private Bundle mSavedInstanceState;
 
 
 
@@ -59,12 +67,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         RadioGroup radioGroup = findViewById(R.id.radio_group);
+        btn_all=findViewById(R.id.button_all);
+        btn_all.setChecked(true);
         radioGroup.setOnCheckedChangeListener(this);
         // Get database
         db = FirebaseFirestore.getInstance();
         fusedClient = LocationServices.getFusedLocationProviderClient(this);
+        HospitalsDao.getHospitalList(this);
+        // Save the instance state
+        mSavedInstanceState = savedInstanceState;
+        //Get location
         getLocation();
-        Hospital.getHospitalList(this);
+
     }
 
     @Override
@@ -90,11 +104,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mHospitalClusterRenderer.updateMarker(mSection, mClusterMarkers);
     }
 
-
-    private void getLocation() {
+    public void getLocation() {
+        // Check if the app is already waiting for a permission
+        if (mWaitingForPermission) {
+            return;
+        }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+            {   mWaitingForPermission = true;
+                    ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+                }
+
         } else {
             Task<Location> task = fusedClient.getLastLocation();
             task.addOnSuccessListener(location -> {
@@ -107,11 +127,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             });
         }
     }
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         Log.d("MapsActivity", "onMapReady");
         mGoogleMap = googleMap;
         mClusterManager = new ClusterManager<>(this, googleMap);
+        // Set the distance threshold for clustering (in pixels)
+       // mClusterManager.setDistanceThreshold(100);
+
         mClusterManager.setRenderer(new HospitalClusterRenderer(this, mGoogleMap, mClusterManager));
         mHospitalClusterRenderer = new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager);
 
@@ -150,12 +174,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             addHospitalsToMap(mHospitals);
         }
 
+        @Override
+        protected void onResume() {
+            super.onResume();
+
+            // Check if the app was waiting for a permission
+            if (mWaitingForPermission) {
+                // Restore the instance state
+                if (mSavedInstanceState != null) {
+                    onRestoreInstanceState(mSavedInstanceState);
+                }
+            }
+        }
+
 
 
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Reset the flag
+        mWaitingForPermission = false;
         if (requestCode == REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 getLocation();

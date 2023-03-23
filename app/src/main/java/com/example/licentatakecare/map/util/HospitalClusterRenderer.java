@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
@@ -67,6 +68,11 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
                 Log.e("Marker update", "Marker not found for cluster marker");
             }
         }
+    }
+    @Override
+    protected boolean shouldRenderAsCluster(Cluster<ClusterMarker> cluster) {
+        // always return false to prevent clustering
+        return false;
     }
 
     private BitmapDescriptor getMarkerIcon(ClusterMarker clusterMarker) {
