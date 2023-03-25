@@ -14,7 +14,7 @@ public class DirectionsHelper {
         private static final int MAX_HOSPITAL_DISTANCE = 10000; // Maximum distance to consider a hospital (in meters)
         private static final int MAX_HOSPITAL_AVAILABILITY = 0; // Maximum availability to consider a hospital
 
-        public static Hospital getClosestHospitalWithAvailability(Location currentLocation, List<Hospital> hospitals) {
+        public static Hospital getClosestHospitalWithAvailability(Location currentLocation, List<Hospital> hospitals,ESection section) {
             Hospital closestHospital = null;
             float closestDistance = Float.MAX_VALUE;
 
@@ -25,7 +25,7 @@ public class DirectionsHelper {
                 hospitalLocation.setLongitude(geoPoint.getLongitude());
 
                 float distance = currentLocation.distanceTo(hospitalLocation);
-                if (distance <= MAX_HOSPITAL_DISTANCE && hospital.getAvailability(ESection.ALL) > MAX_HOSPITAL_AVAILABILITY) {
+                if (distance <= MAX_HOSPITAL_DISTANCE && hospital.getAvailability(section) > MAX_HOSPITAL_AVAILABILITY) {
                     if (distance < closestDistance) {
                         closestHospital = hospital;
                         closestDistance = distance;

@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import androidx.core.content.ContextCompat;
@@ -22,13 +21,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarker> {
     private final Context mContext;
-    private List<Hospital> hospitals = new ArrayList<>();
+   // private List<Hospital> hospitals = new ArrayList<>();
     private ESection mSection = ESection.ALL;
 
     public HospitalClusterRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager) {
@@ -50,7 +47,7 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         // Set the Marker as the marker property of the corresponding ClusterMarker
         clusterItem.setMarker(marker);
         // If the number of available places is greater than 0, display it in a text overlay
-        if (clusterItem.getNumAvailablePlaces() > 0) {
+        if (clusterItem.getNumAvailablePlaces() >= 0) {
             marker.setIcon(getMarkerIcon(clusterItem));
         }
     }
@@ -68,6 +65,10 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
                 Log.e("Marker update", "Marker not found for cluster marker");
             }
         }
+    }
+    public void updateHospitalChanged(ESection esection, List<ClusterMarker> markers,List<Hospital> hospitals)
+    {
+
     }
     @Override
     protected boolean shouldRenderAsCluster(Cluster<ClusterMarker> cluster) {

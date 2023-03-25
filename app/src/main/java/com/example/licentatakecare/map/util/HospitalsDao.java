@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.licentatakecare.map.models.Hospital;
 import com.example.licentatakecare.map.models.Section;
@@ -14,7 +15,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -37,39 +41,29 @@ public class HospitalsDao {
                     // sections for the current hospital
                     CollectionReference sectionsRef = hospitalsRef.document(document.getId()).collection("sections");
 
-                    Task<Void> task = sectionsRef.get().continueWith(new Continuation<QuerySnapshot, Void>() {
+                    sectionsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
-                        public Void then(@NonNull Task<QuerySnapshot> task) throws Exception {
-                            if (task.isSuccessful()) {
+                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.e(TAG, "Error getting sections for hospital " + document.getId(), e);
+                                return;
+                            }
+
+                            if (queryDocumentSnapshots != null) {
                                 List<Section> sections = new ArrayList<>();
-                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                     Section section = document.toObject(Section.class);
                                     section.setId(document.getId());
                                     sections.add(section);
                                 }
                                 hospital.setSections(sections);
                                 hospitals.add(hospital);
-                                Log.d("Spitale",""+hospital.getName());
-                            } else {
-                                Log.e(TAG, "Error getting sections for hospital " + document.getId(), task.getException());
+                                Log.d("Spitale", "" + hospital.getName());
+                                callback.onHospitalsRetrieved(hospitals);
                             }
-                            return null;
                         }
                     });
-                    tasks.add(task);
                 }
-                Tasks.whenAll(tasks).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        callback.onHospitalsRetrieved(hospitals);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "Error getting sections for hospitals", e);
-                        callback.onHospitalsRetrieved(new ArrayList<Hospital>());
-                    }
-                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

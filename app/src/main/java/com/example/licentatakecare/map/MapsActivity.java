@@ -1,4 +1,5 @@
 package com.example.licentatakecare.map;
+
 import static com.example.licentatakecare.map.util.ESection.ALL;
 import static com.example.licentatakecare.map.util.ESection.CARDIOLOGY;
 import static com.example.licentatakecare.map.util.ESection.EMERGENCY;
@@ -18,9 +19,11 @@ import android.widget.RadioGroup;
 
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.databinding.ActivityMapsBinding;
+import com.example.licentatakecare.map.comparator.DistanceComparator;
 import com.example.licentatakecare.map.models.ClusterMarker;
 import com.example.licentatakecare.map.models.Hospital;
 import com.example.licentatakecare.map.util.ESection;
+import com.example.licentatakecare.map.util.FirestoreUpdateListener;
 import com.example.licentatakecare.map.util.HospitalClusterRenderer;
 import com.example.licentatakecare.map.util.HospitalsCallback;
 import com.example.licentatakecare.map.util.HospitalsDao;
@@ -39,7 +42,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, RadioGroup.OnCheckedChangeListener,HospitalsCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, RadioGroup.OnCheckedChangeListener, HospitalsCallback {
 
     private static final int REQUEST_CODE = 101;
     private GoogleMap mGoogleMap;
@@ -60,25 +63,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Bundle mSavedInstanceState;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         RadioGroup radioGroup = findViewById(R.id.radio_group);
-        btn_all=findViewById(R.id.button_all);
+        btn_all = findViewById(R.id.button_all);
         btn_all.setChecked(true);
         radioGroup.setOnCheckedChangeListener(this);
         // Get database
         db = FirebaseFirestore.getInstance();
+
         fusedClient = LocationServices.getFusedLocationProviderClient(this);
         HospitalsDao.getHospitalList(this);
-        // Save the instance state
         mSavedInstanceState = savedInstanceState;
         //Get location
         getLocation();
-
     }
 
     @Override
@@ -111,9 +112,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            {   mWaitingForPermission = true;
-                    ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
-                }
+            {
+                mWaitingForPermission = true;
+                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+            }
 
         } else {
             Task<Location> task = fusedClient.getLastLocation();
@@ -134,7 +136,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap = googleMap;
         mClusterManager = new ClusterManager<>(this, googleMap);
         // Set the distance threshold for clustering (in pixels)
-       // mClusterManager.setDistanceThreshold(100);
+        // mClusterManager.setDistanceThreshold(100);
 
         mClusterManager.setRenderer(new HospitalClusterRenderer(this, mGoogleMap, mClusterManager));
         mHospitalClusterRenderer = new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager);
@@ -149,7 +151,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("My Current Location");
         // Add my location to the map
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
         googleMap.addMarker(markerOptions);
         mClusterManager.cluster(); // cluster once at the end
 
@@ -161,33 +163,49 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         for (Hospital hospital : hospitals) {
             ClusterMarker marker = new ClusterMarker(hospital, hospital.getAvailability(ALL));
             mClusterMarkers.add(marker);
-            Log.d("Cluster add",""+marker.getTitle());
+            Log.d("Cluster add", "" + marker.getTitle());
             mClusterManager.addItem(marker);
         }
         mClusterManager.cluster(); // cluster once at the end
     }
 
 
-
     public void onHospitalsRetrieved(List<Hospital> hospitals) {
-            mHospitals = hospitals;
-            addHospitalsToMap(mHospitals);
-        }
+        mHospitals = hospitals;
+        addHospitalsToMap(mHospitals);
+    }
 
-        @Override
-        protected void onResume() {
-            super.onResume();
+    public void onHospitalsModified(Hospital hospital) {
+//       // mHospitals = hospitals;
+//     //   for (Hospital mhospital : mHospitals)
+//            for (ClusterMarker clusterMarker : mClusterMarkers) {
+//                if (clusterMarker.getHospital().getId().equals(hospital.getId())) {
+//                    clusterMarker.setmNumAvailablePlaces(hospital.getAvailability(mSection));
+//
+//                }
+//            }
+//        mClusterManager.cluster();
+        Log.d("","A fost mofificat");
+    }
 
-            // Check if the app was waiting for a permission
-            if (mWaitingForPermission) {
-                // Restore the instance state
-                if (mSavedInstanceState != null) {
-                    onRestoreInstanceState(mSavedInstanceState);
-                }
+//    @Override
+//    public void onHospitalUpdated(Hospital hospital) {
+//        mHospitalClusterRenderer.updateHospitalChanged(mSection,mClusterMarkers,hospital);
+//    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Check if the app was waiting for a permission
+        if (mWaitingForPermission) {
+            // Restore the instance state
+            if (mSavedInstanceState != null) {
+                onRestoreInstanceState(mSavedInstanceState);
             }
         }
-
-
+    }
 
 
     @Override
