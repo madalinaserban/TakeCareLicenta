@@ -2,6 +2,7 @@ package com.example.licentatakecare.map.util;
 
 import static android.content.ContentValues.TAG;
 
+import android.nfc.Tag;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -34,12 +35,32 @@ public class HospitalsDao {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 List<Hospital> hospitals = new ArrayList<>();
-                List<Task<Void>> tasks = new ArrayList<>();
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                     Hospital hospital = document.toObject(Hospital.class);
                     hospital.setId(document.getId());
                     // sections for the current hospital
                     CollectionReference sectionsRef = hospitalsRef.document(document.getId()).collection("sections");
+
+                    sectionsRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            List<Section> sections = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                Section section = document.toObject(Section.class);
+                                section.setId(document.getId());
+                                sections.add(section);
+                            }
+                            hospital.setSections(sections);
+                            hospitals.add(hospital);
+                            callback.onHospitalsRetrieved(hospitals);
+                            Log.d(TAG,"OnHospitalsRetrieved");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e(TAG, "Error getting sections for hospital " + document.getId(), e);
+                        }
+                    });
 
                     sectionsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
@@ -57,9 +78,8 @@ public class HospitalsDao {
                                     sections.add(section);
                                 }
                                 hospital.setSections(sections);
-                                hospitals.add(hospital);
-                                Log.d("Spitale", "" + hospital.getName());
-                                callback.onHospitalsRetrieved(hospitals);
+                                callback.onHospitalUpdated(hospital);
+                                Log.d(TAG,"OnHospitalUpdated");
                             }
                         }
                     });
@@ -73,6 +93,5 @@ public class HospitalsDao {
             }
         });
     }
-
 
 }

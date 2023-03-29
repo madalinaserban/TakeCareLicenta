@@ -34,6 +34,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -175,23 +176,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         addHospitalsToMap(mHospitals);
     }
 
-    public void onHospitalsModified(Hospital hospital) {
-//       // mHospitals = hospitals;
-//     //   for (Hospital mhospital : mHospitals)
-//            for (ClusterMarker clusterMarker : mClusterMarkers) {
-//                if (clusterMarker.getHospital().getId().equals(hospital.getId())) {
-//                    clusterMarker.setmNumAvailablePlaces(hospital.getAvailability(mSection));
-//
-//                }
-//            }
-//        mClusterManager.cluster();
-        Log.d("","A fost mofificat");
-    }
+    public void onHospitalUpdated(Hospital hospital) {
+            for (ClusterMarker clusterMarker : mClusterMarkers) {
+                if (clusterMarker.getHospital().getId().equals(hospital.getId())) {
+                    clusterMarker.setmNumAvailablePlaces(hospital.getAvailability(mSection));
+                    mHospitalClusterRenderer.updateHospitalChanged(clusterMarker);
+                }
+            }
+            Log.d("", "A fost modificat");
+        }
 
-//    @Override
-//    public void onHospitalUpdated(Hospital hospital) {
-//        mHospitalClusterRenderer.updateHospitalChanged(mSection,mClusterMarkers,hospital);
-//    }
 
 
     @Override

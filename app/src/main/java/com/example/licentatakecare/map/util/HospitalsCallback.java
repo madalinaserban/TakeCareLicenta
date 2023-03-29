@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface HospitalsCallback {
     void onHospitalsRetrieved(List<Hospital> hospitals);
-    void onHospitalsModified(Hospital hospital);
+    void onHospitalUpdated(Hospital hospital);
 }

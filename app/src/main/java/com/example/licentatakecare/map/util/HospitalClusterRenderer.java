@@ -21,12 +21,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+
 import java.util.List;
 
 public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarker> {
     private final Context mContext;
-   // private List<Hospital> hospitals = new ArrayList<>();
+    // private List<Hospital> hospitals = new ArrayList<>();
     private ESection mSection = ESection.ALL;
+    private boolean updated = false;
 
     public HospitalClusterRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager) {
         super(context, map, clusterManager);
@@ -52,10 +54,10 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         }
     }
 
-    public void updateMarker(ESection esection,List<ClusterMarker> markers) {
+    public void updateMarker(ESection esection, List<ClusterMarker> markers) {
         for (ClusterMarker clusterMarker : markers) {
             Hospital hospital = clusterMarker.getHospital();
-             mSection = esection;
+            mSection = esection;
             int numAvailablePlaces = hospital.getAvailability(mSection);
             clusterMarker.setmNumAvailablePlaces(numAvailablePlaces);
             Marker marker = clusterMarker.getMarker(); // get the Marker object from the ClusterMarker
@@ -66,10 +68,18 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
             }
         }
     }
-    public void updateHospitalChanged(ESection esection, List<ClusterMarker> markers,List<Hospital> hospitals)
-    {
 
+    public void updateHospitalChanged(ClusterMarker clusterMarker) {
+        Marker marker = clusterMarker.getMarker();
+        if (marker != null) {
+            updated = true;
+            marker.setIcon(getMarkerIcon(clusterMarker));
+        } else {
+            Log.e("Marker update", "Marker not found for cluster marker");
+        }
+        updated = false;
     }
+
     @Override
     protected boolean shouldRenderAsCluster(Cluster<ClusterMarker> cluster) {
         // always return false to prevent clustering
@@ -77,9 +87,10 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
     }
 
     private BitmapDescriptor getMarkerIcon(ClusterMarker clusterMarker) {
+        int textColor = updated ? Color.RED : Color.WHITE;
         TextDrawable drawable = TextDrawable.builder()
                 .beginConfig()
-                .textColor(Color.WHITE)
+                .textColor(textColor)
                 .useFont(Typeface.DEFAULT_BOLD)
                 .fontSize(50)
                 .bold()
