@@ -21,6 +21,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+import android.os.Handler;
+
+
 
 import java.util.List;
 
@@ -28,7 +31,7 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
     private final Context mContext;
     // private List<Hospital> hospitals = new ArrayList<>();
     private ESection mSection = ESection.ALL;
-    private boolean updated = false;
+    private BitmapDescriptor originalMarkerIcon;
 
     public HospitalClusterRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager) {
         super(context, map, clusterManager);
@@ -50,7 +53,7 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         clusterItem.setMarker(marker);
         // If the number of available places is greater than 0, display it in a text overlay
         if (clusterItem.getNumAvailablePlaces() >= 0) {
-            marker.setIcon(getMarkerIcon(clusterItem));
+            marker.setIcon(getMarkerIcon(clusterItem,Color.WHITE));
         }
     }
 
@@ -62,23 +65,27 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
             clusterMarker.setmNumAvailablePlaces(numAvailablePlaces);
             Marker marker = clusterMarker.getMarker(); // get the Marker object from the ClusterMarker
             if (marker != null) {
-                marker.setIcon(getMarkerIcon(clusterMarker));
+                marker.setIcon(getMarkerIcon(clusterMarker,Color.WHITE));
             } else {
                 Log.e("Marker update", "Marker not found for cluster marker");
             }
         }
     }
 
+
     public void updateHospitalChanged(ClusterMarker clusterMarker) {
         Marker marker = clusterMarker.getMarker();
         if (marker != null) {
-            updated = true;
-            marker.setIcon(getMarkerIcon(clusterMarker));
+            marker.setIcon(getMarkerIcon(clusterMarker, Color.RED));
+            new Handler().postDelayed(() -> {
+                    marker.setIcon(getMarkerIcon(clusterMarker, Color.WHITE));
+
+            }, 3000); // 3 seconds
         } else {
             Log.e("Marker update", "Marker not found for cluster marker");
         }
-        updated = false;
     }
+
 
     @Override
     protected boolean shouldRenderAsCluster(Cluster<ClusterMarker> cluster) {
@@ -86,11 +93,10 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         return false;
     }
 
-    private BitmapDescriptor getMarkerIcon(ClusterMarker clusterMarker) {
-        int textColor = updated ? Color.RED : Color.WHITE;
+    private BitmapDescriptor getMarkerIcon(ClusterMarker clusterMarker,int color) {
         TextDrawable drawable = TextDrawable.builder()
                 .beginConfig()
-                .textColor(textColor)
+                .textColor(color)
                 .useFont(Typeface.DEFAULT_BOLD)
                 .fontSize(50)
                 .bold()
