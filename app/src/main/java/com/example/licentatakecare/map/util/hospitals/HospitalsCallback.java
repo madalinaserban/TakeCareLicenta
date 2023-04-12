@@ -1,6 +1,6 @@
-package com.example.licentatakecare.map.util;
+package com.example.licentatakecare.map.util.hospitals;
 
-import com.example.licentatakecare.map.models.Hospital;
+import com.example.licentatakecare.map.models.hospital.Hospital;
 
 import java.util.List;
 

@@ -1,17 +1,15 @@
 package com.example.licentatakecare.map;
 
-import static com.example.licentatakecare.map.util.ESection.ALL;
-import static com.example.licentatakecare.map.util.ESection.CARDIOLOGY;
-import static com.example.licentatakecare.map.util.ESection.EMERGENCY;
-import static com.example.licentatakecare.map.util.ESection.RADIOLOGY;
+import static com.example.licentatakecare.map.util.clusters.ESection.ALL;
+import static com.example.licentatakecare.map.util.clusters.ESection.CARDIOLOGY;
+import static com.example.licentatakecare.map.util.clusters.ESection.EMERGENCY;
+import static com.example.licentatakecare.map.util.clusters.ESection.RADIOLOGY;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -24,19 +22,20 @@ import android.widget.Toast;
 
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.databinding.ActivityMapsBinding;
-import com.example.licentatakecare.map.models.ClusterMarker;
-import com.example.licentatakecare.map.models.Hospital;
-import com.example.licentatakecare.map.models.HospitalDistanceCalculator;
-import com.example.licentatakecare.map.util.Directions.DirectionsApiInterface;
-import com.example.licentatakecare.map.util.Directions.DirectionsResponse;
-import com.example.licentatakecare.map.util.Directions.Leg;
-import com.example.licentatakecare.map.util.Directions.Route;
-import com.example.licentatakecare.map.util.Directions.Step;
-import com.example.licentatakecare.map.util.ESection;
-import com.example.licentatakecare.map.util.FirestoreUpdateListener;
-import com.example.licentatakecare.map.util.HospitalClusterRenderer;
-import com.example.licentatakecare.map.util.HospitalsCallback;
-import com.example.licentatakecare.map.util.HospitalsDao;
+import com.example.licentatakecare.map.models.cluster.ClusterMarker;
+import com.example.licentatakecare.map.models.hospital.Hospital;
+import com.example.licentatakecare.map.util.directions.HospitalDistanceCalculator;
+import com.example.licentatakecare.map.models.directions.DirectionsApiInterface;
+import com.example.licentatakecare.map.models.directions.DirectionsResponse;
+import com.example.licentatakecare.map.models.directions.Leg;
+import com.example.licentatakecare.map.models.directions.Route;
+import com.example.licentatakecare.map.models.directions.Step;
+import com.example.licentatakecare.map.util.clusters.ESection;
+import com.example.licentatakecare.map.util.clusters.HospitalClusterRenderer;
+import com.example.licentatakecare.map.util.directions.HospitalRouteGenerator;
+import com.example.licentatakecare.map.util.directions.callback.DirectionsCallback;
+import com.example.licentatakecare.map.util.hospitals.HospitalsCallback;
+import com.example.licentatakecare.map.util.hospitals.HospitalsDao;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -44,7 +43,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
@@ -54,7 +52,6 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import retrofit2.Call;
@@ -74,6 +71,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private List<Hospital> mHospitals = new ArrayList<>();
     private ClusterManager<ClusterMarker> mClusterManager;
     private HospitalClusterRenderer mHospitalClusterRenderer;
+    private HospitalRouteGenerator mRouteGenerator;
     private ESection mSection = ALL;
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
@@ -91,6 +89,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         RadioGroup radioGroup = findViewById(R.id.radio_group);
+        mRouteGenerator = new HospitalRouteGenerator();
         btn_all = findViewById(R.id.button_all);
         btn_all.setChecked(true);
         radioGroup.setOnCheckedChangeListener(this);
@@ -104,8 +103,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         getLocation();
     }
 
-    public void findNearestHospital(View view) {
-        displayDirectionsToClosestHospital();
+    public void showRouteToNearestHospital(View view) {
+            mRouteGenerator.displayDirectionsToClosestHospital(this, currentLocation, mHospitals, new DirectionsCallback() {
+                @Override
+                public void onSuccess(Route route) {
+                    // Loop through each leg of the route
+                    for (Leg leg : route.getLegs()) {
+
+                        // Loop through each step of the leg
+                        for (Step step : leg.getSteps()) {
+
+                            // Get the polyline of the step and decode it to a list of LatLng points
+                            List<LatLng> points = PolyUtil.decode(String.valueOf(step.getPolyline().getPoints()));
+
+                            // Draw the polyline on the map
+                            PolylineOptions polylineOptions = new PolylineOptions()
+                                    .addAll(points)
+                                    .color(Color.GREEN)
+                                    .width(5);
+                            mGoogleMap.addPolyline(polylineOptions);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure() {
+                    // Handle the error here
+                }
+            });
+
     }
 
 
@@ -235,108 +261,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 getLocation();
         }
-    }
-
-    private void displayDirectionsToClosestHospital() {
-        // Check if the user's location is available
-        if (currentLocation == null) {
-            Toast.makeText(this, "Please wait for your location to be determined", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Find the closest hospital to the user's current location
-        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        TreeMap<Double, Hospital> hospitalsByDistance = calculator.getHospitalsByDistance(latLng,mHospitals);
-        Hospital closestHospital = hospitalsByDistance.firstEntry().getValue();
-
-        // Use the Google Maps API to draw a route from the user's current location to the closest hospital
-        LatLng hlatLng = new LatLng(closestHospital.getGeoPoint().getLatitude(), closestHospital.getGeoPoint().getLongitude());
-        getDirections(latLng, hlatLng);
-
-        // Display a dialog box to the user with the directions and the distance to the hospital
-//        double distance = hospitalsByDistance.firstKey();
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setMessage("The closest hospital is " + closestHospital.getName() + " which is " + distance + " meters away. Do you want directions to this hospital?");
-//        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int id) {
-//                //  getDirections();
-//            }
-//        });
-//        builder.setNegativeButton("No", null);
-//        builder.show();
-    }
-
-    private void getDirections(LatLng origin, LatLng destination) {
-        String url = "https://maps.googleapis.com/maps/api/directions/json?" +
-                "origin=" + origin.latitude + "," + origin.longitude +
-                "&destination=" + destination.latitude + "," + destination.longitude +
-                "&key=" + getResources().getString(R.string.google_maps_key);
-
-
-        createDirectionsApi().getDirections(url).enqueue(new Callback<DirectionsResponse>() {
-                    @Override
-                    public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
-                        if (!response.isSuccessful()) {
-                            // Handle non-successful response here
-                            Log.e("", "Direction response not successful: " + response.code());
-                            return;
-                        }
-
-                        Log.e("", "Origin: " + origin.longitude+" "+origin.latitude);
-                        Log.e("", "Destination: " + destination.longitude+" "+destination.latitude);
-
-                        DirectionsResponse directionsResponse = response.body();
-                        if (directionsResponse == null) {
-                            // Handle null response here
-                            Log.e("", "Direction response body is null");
-                            return;
-                        }
-
-                        List<Route> routes = directionsResponse.getRoutes();
-                        if (routes.isEmpty()) {
-                            // Handle empty routes here
-                            Log.e("", "Direction response has no routes");
-                            return;
-                        }
-
-                        // Get the first route
-                        Route route = routes.get(0);
-
-
-                        // Loop through each leg of the route
-                        for (Leg leg : route.getLegs()) {
-
-                            // Loop through each step of the leg
-                            for (Step step : leg.getSteps()) {
-
-                                // Get the polyline of the step and decode it to a list of LatLng points
-                                List<LatLng> points = PolyUtil.decode(String.valueOf(step.getPolyline().getPoints()));
-
-                                // Draw the polyline on the map
-                                PolylineOptions polylineOptions = new PolylineOptions()
-                                        .addAll(points)
-                                        .color(Color.RED)
-                                        .width(10);
-                                mGoogleMap.addPolyline(polylineOptions);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<DirectionsResponse> call, Throwable t) {
-                        // Handle failure here
-                        Log.e("A", "Direction API request failed", t);
-                    }
-                });
-    }
-
-
-    private DirectionsApiInterface createDirectionsApi() {
-        return new Retrofit.Builder()
-                .baseUrl("https://maps.googleapis.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(DirectionsApiInterface.class);
     }
 
 

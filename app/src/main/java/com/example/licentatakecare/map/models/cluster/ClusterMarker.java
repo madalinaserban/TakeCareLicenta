@@ -1,5 +1,6 @@
-package com.example.licentatakecare.map.models;
+package com.example.licentatakecare.map.models.cluster;
 
+import com.example.licentatakecare.map.models.hospital.Hospital;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.ClusterItem;

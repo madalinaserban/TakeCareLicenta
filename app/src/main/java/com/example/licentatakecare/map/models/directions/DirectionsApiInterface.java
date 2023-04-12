@@ -1,10 +1,7 @@
-package com.example.licentatakecare.map.util.Directions;
-
-import com.google.maps.model.DistanceMatrix;
+package com.example.licentatakecare.map.models.directions;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Query;
 import retrofit2.http.Url;
 
 public interface DirectionsApiInterface {

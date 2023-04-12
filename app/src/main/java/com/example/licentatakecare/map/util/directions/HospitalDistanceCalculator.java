@@ -1,18 +1,8 @@
-package com.example.licentatakecare.map.models;
+package com.example.licentatakecare.map.util.directions;
 
-import android.location.Location;
-
+import com.example.licentatakecare.map.models.hospital.Hospital;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.DirectionsApi;
-import com.google.maps.DirectionsApiRequest;
-import com.google.maps.GeoApiContext;
-import com.google.maps.PendingResult;
-import com.google.maps.errors.ApiException;
-import com.google.maps.model.DirectionsResult;
-import com.google.maps.model.TravelMode;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 

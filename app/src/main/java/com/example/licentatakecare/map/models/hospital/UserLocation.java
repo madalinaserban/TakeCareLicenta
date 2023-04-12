@@ -1,4 +1,4 @@
-package com.example.licentatakecare.map.models;
+package com.example.licentatakecare.map.models.hospital;
 
 import com.google.android.gms.maps.model.LatLng;
 

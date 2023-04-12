@@ -1,25 +1,20 @@
-package com.example.licentatakecare.map.util;
+package com.example.licentatakecare.map.util.hospitals;
 
 import static android.content.ContentValues.TAG;
 
-import android.nfc.Tag;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.licentatakecare.map.models.Hospital;
-import com.example.licentatakecare.map.models.Section;
-import com.google.android.gms.tasks.Continuation;
+import com.example.licentatakecare.map.models.hospital.Hospital;
+import com.example.licentatakecare.map.models.hospital.Section;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 

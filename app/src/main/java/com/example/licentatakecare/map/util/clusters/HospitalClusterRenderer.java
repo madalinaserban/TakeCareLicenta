@@ -1,4 +1,4 @@
-package com.example.licentatakecare.map.util;
+package com.example.licentatakecare.map.util.clusters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,8 +11,8 @@ import androidx.core.content.ContextCompat;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.example.licentatakecare.R;
-import com.example.licentatakecare.map.models.ClusterMarker;
-import com.example.licentatakecare.map.models.Hospital;
+import com.example.licentatakecare.map.models.cluster.ClusterMarker;
+import com.example.licentatakecare.map.models.hospital.Hospital;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
