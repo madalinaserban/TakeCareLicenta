@@ -29,7 +29,6 @@ import java.util.List;
 
 public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarker> {
     private final Context mContext;
-    // private List<Hospital> hospitals = new ArrayList<>();
     private ESection mSection = ESection.ALL;
     private BitmapDescriptor originalMarkerIcon;
 

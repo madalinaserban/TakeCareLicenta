@@ -1,6 +1,8 @@
 package com.example.licentatakecare.map.util.directions;
 
 import com.example.licentatakecare.map.models.hospital.Hospital;
+import com.example.licentatakecare.map.models.hospital.Section;
+import com.example.licentatakecare.map.util.clusters.ESection;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
@@ -20,6 +22,8 @@ public class HospitalDistanceCalculator {
         return hospitalsByDistance;
     }
 
+
+    //EUCLIDIAN DE FACUT DUPA HARTA !!!
     private static double distanceBetween(LatLng point1, LatLng point2) {
         double lat1 = point1.latitude;
         double lon1 = point1.longitude;

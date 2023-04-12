@@ -52,6 +52,7 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import retrofit2.Call;
@@ -73,6 +74,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private HospitalClusterRenderer mHospitalClusterRenderer;
     private HospitalRouteGenerator mRouteGenerator;
     private ESection mSection = ALL;
+    TreeMap<Double, Hospital> hospitalsByDistance=new TreeMap<>();
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
     HospitalDistanceCalculator calculator = new HospitalDistanceCalculator();
@@ -104,7 +106,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void showRouteToNearestHospital(View view) {
-            mRouteGenerator.displayDirectionsToClosestHospital(this, currentLocation, mHospitals, new DirectionsCallback() {
+        // Find the closest hospital to the user's current location
+        //TO DO : Muta astea undeva in afara ca sa ai acces constant la Tree
+        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        TreeMap<Double, Hospital> hospitalsByDistance = calculator.getHospitalsByDistance(latLng, mHospitals);
+        Hospital closestHospital = hospitalsByDistance.firstEntry().getValue();
+
+        for (Map.Entry<Double, Hospital> entry : hospitalsByDistance.entrySet()) {
+            Hospital hospital = entry.getValue();
+            if (hospital.getAvailability(mSection) > 0) {
+                closestHospital = hospital;
+                break; // exit the loop once a hospital with availability is found
+            }
+        }
+            mRouteGenerator.displayDirectionsToHospital(this, currentLocation, closestHospital, new DirectionsCallback() {
                 @Override
                 public void onSuccess(Route route) {
                     // Loop through each leg of the route
@@ -156,6 +171,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 break;
         }
         mHospitalClusterRenderer.updateMarker(mSection, mClusterMarkers);
+
+
     }
 
     public void getLocation() {

@@ -32,14 +32,10 @@ public class HospitalRouteGenerator {
                 .create(DirectionsApiInterface.class);
     }
 
-    public void displayDirectionsToClosestHospital(Context mContext, Location currentLocation, List<Hospital> mHospitals, final DirectionsCallback directionsCallback) {
-
-        // Find the closest hospital to the user's current location
-        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        TreeMap<Double, Hospital> hospitalsByDistance = calculator.getHospitalsByDistance(latLng, mHospitals);
-        Hospital closestHospital = hospitalsByDistance.firstEntry().getValue();
+    public void displayDirectionsToHospital(Context mContext, Location currentLocation, Hospital closestHospital, final DirectionsCallback directionsCallback) {
 
         // Use the Google Maps API to draw a route from the user's current location to the closest hospital
+        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         LatLng hlatLng = new LatLng(closestHospital.getGeoPoint().getLatitude(), closestHospital.getGeoPoint().getLongitude());
         String url = "https://maps.googleapis.com/maps/api/directions/json?" +
                 "origin=" + latLng.latitude + "," + latLng.longitude +
