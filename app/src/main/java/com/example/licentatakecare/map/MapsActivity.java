@@ -205,10 +205,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("MapsActivity", "onMapReady");
         mGoogleMap = googleMap;
         mClusterManager = new ClusterManager<>(this, googleMap);
-        // Set the distance threshold for clustering (in pixels)
-        // mClusterManager.setDistanceThreshold(100);
-
-        mClusterManager.setRenderer(new HospitalClusterRenderer(this, mGoogleMap, mClusterManager));
+        mClusterManager.setRenderer(new HospitalClusterRenderer( getApplicationContext(),mGoogleMap, mClusterManager));
         mHospitalClusterRenderer = new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
