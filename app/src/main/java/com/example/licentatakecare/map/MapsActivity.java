@@ -8,25 +8,29 @@ import static com.example.licentatakecare.map.util.clusters.ESection.RADIOLOGY;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.databinding.ActivityMapsBinding;
 import com.example.licentatakecare.map.models.cluster.ClusterMarker;
 import com.example.licentatakecare.map.models.hospital.Hospital;
 import com.example.licentatakecare.map.util.directions.HospitalDistanceCalculator;
-import com.example.licentatakecare.map.models.directions.DirectionsApiInterface;
-import com.example.licentatakecare.map.models.directions.DirectionsResponse;
 import com.example.licentatakecare.map.models.directions.Leg;
 import com.example.licentatakecare.map.models.directions.Route;
 import com.example.licentatakecare.map.models.directions.Step;
@@ -47,21 +51,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.maps.android.PolyUtil;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.TreeMap;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, RadioGroup.OnCheckedChangeListener, HospitalsCallback {
 
@@ -77,7 +73,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private HospitalRouteGenerator mRouteGenerator;
     private ESection mSection = ALL;
     private LatLng latLng;
-    PriorityQueue<Hospital> hospitalsByDistance = new PriorityQueue<>();
+    private boolean direction_btn = false;
+    List<Hospital> hospitalsByDistance = new ArrayList<>();
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
     HospitalDistanceCalculator calculator = new HospitalDistanceCalculator();
@@ -102,13 +99,53 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         radioGroup.setOnCheckedChangeListener(this);
         // Get database
         db = FirebaseFirestore.getInstance();
-
+        FrameLayout directionsPanelContainer = findViewById(R.id.directionsPanelContainer);
         fusedClient = LocationServices.getFusedLocationProviderClient(this);
         HospitalsDao.getHospitalList(this);
         mSavedInstanceState = savedInstanceState;
         //Get location
         getLocation();
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.directions_button:
+                        showDirectionsPanel();
+                        return true;
+                    // handle other items here
+                    default:
+                        return false;
+                }
+            }
+        });
+
     }
+
+    public void showDirectionsPanel() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment currentFragment = fragmentManager.findFragmentById(R.id.directionsPanelContainer);
+        if (currentFragment != null) {
+            // The directions panel is already open, so we need to collapse it
+            ObjectAnimator animator = ObjectAnimator.ofFloat(findViewById(R.id.directionsPanelContainer), "translationY", 0);
+            animator.setDuration(700);
+            animator.start();
+            fragmentManager.popBackStack();
+        } else {
+            // The directions panel is closed, so we need to open it
+            DirectionsPanelFragment directionsPanelFragment = new DirectionsPanelFragment();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.directionsPanelContainer, directionsPanelFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+
+            // Animate the expansion of the directions panel
+            ObjectAnimator animator = ObjectAnimator.ofFloat(findViewById(R.id.directionsPanelContainer), "translationY", -findViewById(R.id.directionsPanelContainer).getHeight());
+            animator.setDuration(700);
+            animator.start();
+        }
+    }
+
 
     public void showRouteToNearestHospital() {
         // Clear existing hospital routes from the map
@@ -116,46 +153,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             polyline.remove();
         }
         mRoutePolylines.clear();
-        Hospital closestGreenHospital = hospitalsByDistance.peek();
-        Hospital closestHospital = hospitalsByDistance.peek();
+        Hospital closestGreenHospital = hospitalsByDistance.get(0);
+        Hospital closestHospital = hospitalsByDistance.get(0);
         for (Hospital hospital : hospitalsByDistance) {
-            if (hospital.getAvailability(mSection) > 0.15*hospital.getTotalSpaces(mSection)) {
+            if (hospital.getAvailability(mSection) > 0.15 * hospital.getTotalSpaces(mSection)) {
                 closestGreenHospital = hospital;
                 break; // exit the loop once a hospital with availability is found
             }
         }
-           if(!(closestGreenHospital.equals(closestHospital))) {
-               mRouteGenerator.displayDirectionsToHospital(this, currentLocation, closestHospital, new DirectionsCallback() {
-                   @Override
-                   public void onSuccess(Route route) {
-                       // Loop through each leg of the route
-                       for (Leg leg : route.getLegs()) {
-
-                           // Loop through each step of the leg
-                           for (Step step : leg.getSteps()) {
-
-                               // Get the polyline of the step and decode it to a list of LatLng points
-                               List<LatLng> points = PolyUtil.decode(String.valueOf(step.getPolyline().getPoints()));
-
-                               // Draw the polyline on the map
-                               PolylineOptions polylineOptions = new PolylineOptions()
-                                       .addAll(points)
-                                       .color(Color.RED)
-                                       .width(10);
-                               Polyline polyline = mGoogleMap.addPolyline(polylineOptions);
-                               mRoutePolylines.add(polyline); // Add the polyline to the list
-                           }
-                       }
-                   }
-
-                   @Override
-                   public void onFailure() {
-                       // Handle the error here
-                   }
-               });
-           }
-
-            mRouteGenerator.displayDirectionsToHospital(this, currentLocation, closestGreenHospital, new DirectionsCallback() {
+        if (!(closestGreenHospital.equals(closestHospital))) {
+            mRouteGenerator.displayDirectionsToHospital(this, currentLocation, closestHospital, new DirectionsCallback() {
                 @Override
                 public void onSuccess(Route route) {
                     // Loop through each leg of the route
@@ -170,7 +177,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             // Draw the polyline on the map
                             PolylineOptions polylineOptions = new PolylineOptions()
                                     .addAll(points)
-                                    .color(Color.GREEN)
+                                    .color(Color.RED)
                                     .width(10);
                             Polyline polyline = mGoogleMap.addPolyline(polylineOptions);
                             mRoutePolylines.add(polyline); // Add the polyline to the list
@@ -183,6 +190,36 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     // Handle the error here
                 }
             });
+        }
+
+        mRouteGenerator.displayDirectionsToHospital(this, currentLocation, closestGreenHospital, new DirectionsCallback() {
+            @Override
+            public void onSuccess(Route route) {
+                // Loop through each leg of the route
+                for (Leg leg : route.getLegs()) {
+
+                    // Loop through each step of the leg
+                    for (Step step : leg.getSteps()) {
+
+                        // Get the polyline of the step and decode it to a list of LatLng points
+                        List<LatLng> points = PolyUtil.decode(String.valueOf(step.getPolyline().getPoints()));
+
+                        // Draw the polyline on the map
+                        PolylineOptions polylineOptions = new PolylineOptions()
+                                .addAll(points)
+                                .color(Color.GREEN)
+                                .width(10);
+                        Polyline polyline = mGoogleMap.addPolyline(polylineOptions);
+                        mRoutePolylines.add(polyline); // Add the polyline to the list
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure() {
+                // Handle the error here
+            }
+        });
 
     }
 
@@ -213,8 +250,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mHospitalClusterRenderer.updateMarker(mSection, mClusterMarkers);
 
 
-
     }
+
 
     public void getLocation() {
         // Check if the app is already waiting for a permission
@@ -246,7 +283,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("MapsActivity", "onMapReady");
         mGoogleMap = googleMap;
         mClusterManager = new ClusterManager<>(this, googleMap);
-        mClusterManager.setRenderer(new HospitalClusterRenderer( getApplicationContext(),mGoogleMap, mClusterManager));
+        mClusterManager.setRenderer(new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager));
         mHospitalClusterRenderer = new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -282,7 +319,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mHospitals = hospitals;
         addHospitalsToMap(mHospitals);
         latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        hospitalsByDistance = calculator.getHospitalsByDistance(latLng,mHospitals);
+        hospitalsByDistance = calculator.getHospitalsByDistance(latLng, mHospitals);
         showRouteToNearestHospital();
     }
 

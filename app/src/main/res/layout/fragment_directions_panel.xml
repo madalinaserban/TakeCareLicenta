@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:elevation="8dp"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/hospital_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/logo_light"
+        android:scaleType="centerCrop"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"/>
+
+    <TextView
+        android:id="@+id/hospital_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hospital Name"
+        android:textSize="20sp"
+        android:layout_toEndOf="@+id/hospital_image"
+        android:layout_alignParentTop="true"/>
+
+    <RatingBar
+        android:id="@+id/hospital_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="5"
+        android:stepSize="0.5"
+        android:rating="4.5"
+        android:layout_below="@id/hospital_name"
+        android:layout_toEndOf="@+id/hospital_image"/>
+
+    <TextView
+        android:id="@+id/hospital_opening_hours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Open Now: Yes"
+        android:textSize="14sp"
+        android:layout_below="@id/hospital_rating"
+        android:layout_toEndOf="@+id/hospital_image"/>
+
+    <TextView
+        android:id="@+id/hospital_time_to_get_there"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time to get there: 10 min"
+        android:textSize="14sp"
+        android:layout_below="@id/hospital_opening_hours"
+        android:layout_toEndOf="@+id/hospital_image"/>
+
+    <ImageView
+        android:id="@+id/hospital_directions"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/logo_light"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"/>
+
+</RelativeLayout>

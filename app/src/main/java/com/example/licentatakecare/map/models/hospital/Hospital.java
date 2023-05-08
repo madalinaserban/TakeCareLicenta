@@ -9,6 +9,16 @@ public class Hospital implements Comparable<Hospital> {
     private String name;
     private GeoPoint geoPoint;
     private String id;
+    private String google_id;
+
+    public String getGoogle_id() {
+        return google_id;
+    }
+
+    public void setGoogle_id(String google_id) {
+        this.google_id = google_id;
+    }
+
     private List<Section> sections;
     private double distance;
 

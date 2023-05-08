@@ -5,14 +5,17 @@ import com.example.licentatakecare.map.models.hospital.Section;
 import com.example.licentatakecare.map.util.clusters.ESection;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.TreeMap;
 
 public class HospitalDistanceCalculator {
 
-    public static PriorityQueue<Hospital> getHospitalsByDistance(LatLng userLocation, List<Hospital> hospitals) {
-        PriorityQueue<Hospital> hospitalsByDistance = new PriorityQueue<>();
+    public static List<Hospital> getHospitalsByDistance(LatLng userLocation, List<Hospital> hospitals) {
+        List<Hospital> hospitalsByDistance = new ArrayList<>();
 
         for (Hospital hospital : hospitals) {
             LatLng hospitalLocation = new LatLng(hospital.getGeoPoint().getLatitude(), hospital.getGeoPoint().getLongitude());
@@ -20,6 +23,13 @@ public class HospitalDistanceCalculator {
             hospital.setDistance(distance);
             hospitalsByDistance.add(hospital);
         }
+
+        Collections.sort(hospitalsByDistance, new Comparator<Hospital>() {
+            @Override
+            public int compare(Hospital h1, Hospital h2) {
+                return Double.compare(h1.getDistance(), h2.getDistance());
+            }
+        });
 
         return hospitalsByDistance;
     }
@@ -44,3 +54,4 @@ public class HospitalDistanceCalculator {
     }
 
 }
+

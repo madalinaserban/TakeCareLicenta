@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/navigation_item1"
+        android:id="@+id/directions_button"
         android:icon="@drawable/logo_light"
         android:title="Directions" />
     <item
