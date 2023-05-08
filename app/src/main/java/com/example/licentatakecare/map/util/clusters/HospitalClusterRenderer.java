@@ -32,7 +32,7 @@ import android.os.Handler;
 
 import java.util.List;
 
-public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarker> implements GoogleMap.OnCameraIdleListener {
+public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarker>{
     private final Context mContext;
     private ESection mSection = ESection.ALL;
     private int currentZoomLevel;
@@ -43,7 +43,7 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         super(context, map, clusterManager);
         mContext = context;
         currentZoomLevel = (int) map.getCameraPosition().zoom;
-        map.setOnCameraIdleListener(this);
+       // map.setOnCameraIdleListener(this);
         mClusterManager = clusterManager;
         mMap = map;
     }
@@ -96,43 +96,42 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
         }
     }
 
-    @Override
-    protected String getClusterText(int bucket) {
-        if (bucket < 20) {
-            return String.valueOf(bucket);
-        } else {
-            return "+";
-        }
-    }
+//    @Override
+//    protected String getClusterText(int bucket) {
+//        if (bucket < 20) {
+//            return String.valueOf(bucket);
+//        } else {
+//            return "+";
+//        }
+//    }
 
 
 
     @Override
     protected boolean shouldRenderAsCluster(Cluster<ClusterMarker> cluster) {
-        // always return false to prevent clustering
-        // return false;
-        return cluster.getSize() > 20;
+         //always return false to prevent clustering
+         return false;
     }
 
-    @Override
-    public void onCameraIdle() {
-        int newZoomLevel = (int) mMap.getCameraPosition().zoom;
-        if (newZoomLevel != currentZoomLevel) {
-            currentZoomLevel = newZoomLevel;
-            if (newZoomLevel <= 40) {
-                mClusterManager.setAlgorithm(new NonHierarchicalDistanceBasedAlgorithm<ClusterMarker>());
-            } else {
-                mClusterManager.setAlgorithm(new GridBasedAlgorithm<ClusterMarker>());
-            }
-            mClusterManager.cluster();
-        }
-    }
+//    @Override
+//    public void onCameraIdle() {
+//        int newZoomLevel = (int) mMap.getCameraPosition().zoom;
+//        if (newZoomLevel != currentZoomLevel) {
+//            currentZoomLevel = newZoomLevel;
+//            if (newZoomLevel <= 40) {
+//                mClusterManager.setAlgorithm(new NonHierarchicalDistanceBasedAlgorithm<ClusterMarker>());
+//            } else {
+//                mClusterManager.setAlgorithm(new GridBasedAlgorithm<ClusterMarker>());
+//            }
+//            mClusterManager.cluster();
+//        }
+//    }
 
-    @Override
-    protected void onClusterUpdated(Cluster<ClusterMarker> cluster, Marker marker) {
-        super.onClusterUpdated(cluster, marker);
-        marker.setTitle("CLUSTER");
-    }
+//    @Override
+//    protected void onClusterUpdated(Cluster<ClusterMarker> cluster, Marker marker) {
+//        super.onClusterUpdated(cluster, marker);
+//        marker.setTitle("CLUSTER");
+//    }
 
 
     private BitmapDescriptor getMarkerIcon(ClusterMarker clusterMarker, int color) {

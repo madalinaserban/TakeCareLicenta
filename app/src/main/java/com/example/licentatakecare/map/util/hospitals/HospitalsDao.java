@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HospitalsDao {
     public static void getHospitalList(final HospitalsCallback callback) {
@@ -30,6 +31,7 @@ public class HospitalsDao {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 List<Hospital> hospitals = new ArrayList<>();
+                AtomicInteger count =new AtomicInteger(queryDocumentSnapshots.size()); // track number of hospitals processed
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                     Hospital hospital = document.toObject(Hospital.class);
                     hospital.setId(document.getId());
@@ -47,8 +49,10 @@ public class HospitalsDao {
                             }
                             hospital.setSections(sections);
                             hospitals.add(hospital);
-                            callback.onHospitalsRetrieved(hospitals);
-                            Log.d(TAG,"OnHospitalsRetrieved");
+                            if (count.decrementAndGet() == 0) {
+                                callback.onHospitalsRetrieved(hospitals);
+                                Log.d(TAG,"OnHospitalsRetrieved");
+                            }
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -88,5 +92,4 @@ public class HospitalsDao {
             }
         });
     }
-
 }
