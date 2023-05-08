@@ -5,11 +5,20 @@ import com.google.firebase.firestore.GeoPoint;
 
 import java.util.List;
 
-public class Hospital {
+public class Hospital implements Comparable<Hospital> {
     private String name;
     private GeoPoint geoPoint;
     private String id;
     private List<Section> sections;
+    private double distance;
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
 
     public String getId() {
         return id;
@@ -81,6 +90,10 @@ public class Hospital {
             }
         }
         return total_beds;
+    }
+    @Override
+    public int compareTo(Hospital otherHospital) {
+        return Double.compare(distance, otherHospital.distance);
     }
 
 }

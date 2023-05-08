@@ -6,24 +6,24 @@ import com.example.licentatakecare.map.util.clusters.ESection;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.TreeMap;
 
 public class HospitalDistanceCalculator {
 
-    public static TreeMap<Double, Hospital> getHospitalsByDistance(LatLng userLocation, List<Hospital> hospitals) {
-        TreeMap<Double, Hospital> hospitalsByDistance = new TreeMap<>();
+    public static PriorityQueue<Hospital> getHospitalsByDistance(LatLng userLocation, List<Hospital> hospitals) {
+        PriorityQueue<Hospital> hospitalsByDistance = new PriorityQueue<>();
 
         for (Hospital hospital : hospitals) {
             LatLng hospitalLocation = new LatLng(hospital.getGeoPoint().getLatitude(), hospital.getGeoPoint().getLongitude());
             double distance = distanceBetween(userLocation, hospitalLocation);
-            hospitalsByDistance.put(distance, hospital);
+            hospital.setDistance(distance);
+            hospitalsByDistance.add(hospital);
         }
 
         return hospitalsByDistance;
     }
 
-
-    //EUCLIDIAN DE FACUT DUPA HARTA !!!
     private static double distanceBetween(LatLng point1, LatLng point2) {
         double lat1 = point1.latitude;
         double lon1 = point1.longitude;
@@ -42,6 +42,4 @@ public class HospitalDistanceCalculator {
 
         return distance;
     }
-
-
 }

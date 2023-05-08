@@ -44,6 +44,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -53,6 +54,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.TreeMap;
 
 import retrofit2.Call;
@@ -74,12 +76,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private HospitalClusterRenderer mHospitalClusterRenderer;
     private HospitalRouteGenerator mRouteGenerator;
     private ESection mSection = ALL;
-    TreeMap<Double, Hospital> hospitalsByDistance=new TreeMap<>();
+    private LatLng latLng;
+    PriorityQueue<Hospital> hospitalsByDistance = new PriorityQueue<>();
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
     HospitalDistanceCalculator calculator = new HospitalDistanceCalculator();
     // Declare a boolean to keep track of whether the app is waiting for a permission
     private boolean mWaitingForPermission = false;
+    private List<Polyline> mRoutePolylines = new ArrayList<>();
+
 
     // Declare a Bundle to save the state of the activity
     private Bundle mSavedInstanceState;
@@ -106,13 +111,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void showRouteToNearestHospital() {
-
-        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        TreeMap<Double, Hospital> hospitalsByDistance = calculator.getHospitalsByDistance(latLng, mHospitals);
-        Hospital closestGreenHospital = hospitalsByDistance.firstEntry().getValue();
-        Hospital closestHospital = hospitalsByDistance.firstEntry().getValue();
-        for (Map.Entry<Double, Hospital> entry : hospitalsByDistance.entrySet()) {
-            Hospital hospital = entry.getValue();
+        // Clear existing hospital routes from the map
+        for (Polyline polyline : mRoutePolylines) {
+            polyline.remove();
+        }
+        mRoutePolylines.clear();
+        Hospital closestGreenHospital = hospitalsByDistance.peek();
+        Hospital closestHospital = hospitalsByDistance.peek();
+        for (Hospital hospital : hospitalsByDistance) {
             if (hospital.getAvailability(mSection) > 0.15*hospital.getTotalSpaces(mSection)) {
                 closestGreenHospital = hospital;
                 break; // exit the loop once a hospital with availability is found
@@ -136,7 +142,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                        .addAll(points)
                                        .color(Color.RED)
                                        .width(10);
-                               mGoogleMap.addPolyline(polylineOptions);
+                               Polyline polyline = mGoogleMap.addPolyline(polylineOptions);
+                               mRoutePolylines.add(polyline); // Add the polyline to the list
                            }
                        }
                    }
@@ -165,7 +172,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     .addAll(points)
                                     .color(Color.GREEN)
                                     .width(10);
-                            mGoogleMap.addPolyline(polylineOptions);
+                            Polyline polyline = mGoogleMap.addPolyline(polylineOptions);
+                            mRoutePolylines.add(polyline); // Add the polyline to the list
                         }
                     }
                 }
@@ -200,6 +208,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 break;
         }
 
+        // Redraw the hospital routes
+        showRouteToNearestHospital();
         mHospitalClusterRenderer.updateMarker(mSection, mClusterMarkers);
 
 
@@ -271,6 +281,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onHospitalsRetrieved(List<Hospital> hospitals) {
         mHospitals = hospitals;
         addHospitalsToMap(mHospitals);
+        latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        hospitalsByDistance = calculator.getHospitalsByDistance(latLng,mHospitals);
         showRouteToNearestHospital();
     }
 
