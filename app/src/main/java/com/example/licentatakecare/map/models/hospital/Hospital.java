@@ -68,5 +68,19 @@ public class Hospital {
         }
         return availability;
     }
+    public int getTotalSpaces(ESection eSection) {
+        int total_beds = 0;
+        if (!(eSection.name().equals("ALL"))) {
+            for (Section section : sections) {
+                if (section.getName().equals(eSection.toString()))
+                    total_beds = section.getTotal_spaces();
+            }
+        } else {
+            for (Section section : sections) {
+                total_beds += section.getTotal_spaces();
+            }
+        }
+        return total_beds;
+    }
 
 }

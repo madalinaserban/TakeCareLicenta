@@ -105,21 +105,50 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         getLocation();
     }
 
-    public void showRouteToNearestHospital(View view) {
-        // Find the closest hospital to the user's current location
-        //TO DO : Muta astea undeva in afara ca sa ai acces constant la Tree
+    public void showRouteToNearestHospital() {
+
         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         TreeMap<Double, Hospital> hospitalsByDistance = calculator.getHospitalsByDistance(latLng, mHospitals);
+        Hospital closestGreenHospital = hospitalsByDistance.firstEntry().getValue();
         Hospital closestHospital = hospitalsByDistance.firstEntry().getValue();
-
         for (Map.Entry<Double, Hospital> entry : hospitalsByDistance.entrySet()) {
             Hospital hospital = entry.getValue();
-            if (hospital.getAvailability(mSection) > 0) {
-                closestHospital = hospital;
+            if (hospital.getAvailability(mSection) > 0.15*hospital.getTotalSpaces(mSection)) {
+                closestGreenHospital = hospital;
                 break; // exit the loop once a hospital with availability is found
             }
         }
-            mRouteGenerator.displayDirectionsToHospital(this, currentLocation, closestHospital, new DirectionsCallback() {
+           if(!(closestGreenHospital.equals(closestHospital))) {
+               mRouteGenerator.displayDirectionsToHospital(this, currentLocation, closestHospital, new DirectionsCallback() {
+                   @Override
+                   public void onSuccess(Route route) {
+                       // Loop through each leg of the route
+                       for (Leg leg : route.getLegs()) {
+
+                           // Loop through each step of the leg
+                           for (Step step : leg.getSteps()) {
+
+                               // Get the polyline of the step and decode it to a list of LatLng points
+                               List<LatLng> points = PolyUtil.decode(String.valueOf(step.getPolyline().getPoints()));
+
+                               // Draw the polyline on the map
+                               PolylineOptions polylineOptions = new PolylineOptions()
+                                       .addAll(points)
+                                       .color(Color.RED)
+                                       .width(10);
+                               mGoogleMap.addPolyline(polylineOptions);
+                           }
+                       }
+                   }
+
+                   @Override
+                   public void onFailure() {
+                       // Handle the error here
+                   }
+               });
+           }
+
+            mRouteGenerator.displayDirectionsToHospital(this, currentLocation, closestGreenHospital, new DirectionsCallback() {
                 @Override
                 public void onSuccess(Route route) {
                     // Loop through each leg of the route
@@ -135,7 +164,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             PolylineOptions polylineOptions = new PolylineOptions()
                                     .addAll(points)
                                     .color(Color.GREEN)
-                                    .width(5);
+                                    .width(10);
                             mGoogleMap.addPolyline(polylineOptions);
                         }
                     }
@@ -170,7 +199,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d("RadioGroup", mSection.toString());
                 break;
         }
+
         mHospitalClusterRenderer.updateMarker(mSection, mClusterMarkers);
+
 
 
     }
@@ -240,6 +271,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onHospitalsRetrieved(List<Hospital> hospitals) {
         mHospitals = hospitals;
         addHospitalsToMap(mHospitals);
+        showRouteToNearestHospital();
     }
 
     public void onHospitalUpdated(Hospital hospital) {
