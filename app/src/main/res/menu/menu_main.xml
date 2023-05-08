@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_item1"
+        android:icon="@drawable/logo_light"
+        android:title="Directions" />
+    <item
+        android:id="@+id/navigation_item2"
+        android:icon="@drawable/logo_light"
+        android:title="Profile" />
+    <item
+        android:id="@+id/navigation_item3"
+        android:icon="@drawable/logo_light"
+        android:title="Settings" />
+</menu>

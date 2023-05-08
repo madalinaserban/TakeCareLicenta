@@ -12,6 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="bottomNavigationStyle">@style/Widget.Design.BottomNavigationView</item>
+
     </style>
     <style name="Theme.LicentaTakeCare.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -20,4 +22,5 @@
     <style name="Theme.LicentaTakeCare.AppBarOverlay"
         parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="Theme.LicentaTakeCare.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 </resources>

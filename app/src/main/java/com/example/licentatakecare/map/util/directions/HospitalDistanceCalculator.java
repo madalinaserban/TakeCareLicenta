@@ -42,4 +42,5 @@ public class HospitalDistanceCalculator {
 
         return distance;
     }
+
 }

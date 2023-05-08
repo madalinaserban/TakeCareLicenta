@@ -20,4 +20,6 @@ public class Distance {
     public void setValue(int value) {
         this.value = value;
     }
+
+
 }

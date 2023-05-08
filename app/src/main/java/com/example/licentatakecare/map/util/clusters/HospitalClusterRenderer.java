@@ -39,7 +39,9 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
     private ClusterManager<ClusterMarker> mClusterManager;
     private GoogleMap mMap;
 
-    public HospitalClusterRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager) {
+    public HospitalClusterRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager)
+   // implements GoogleMap.OnCameraIdleListener
+    {
         super(context, map, clusterManager);
         mContext = context;
         currentZoomLevel = (int) map.getCameraPosition().zoom;
