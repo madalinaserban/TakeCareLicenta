@@ -33,7 +33,9 @@
         android:stepSize="0.5"
         android:rating="4.5"
         android:layout_below="@id/hospital_name"
-        android:layout_toEndOf="@+id/hospital_image"/>
+        android:layout_toEndOf="@+id/hospital_image"
+        android:isIndicator="true"
+        android:progressTint="@color/blue" />
 
     <TextView
         android:id="@+id/hospital_opening_hours"
@@ -53,12 +55,23 @@
         android:layout_below="@id/hospital_opening_hours"
         android:layout_toEndOf="@+id/hospital_image"/>
 
-    <ImageView
-        android:id="@+id/hospital_directions"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/logo_light"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"/>
+    <TextView
+        android:id="@+id/hospital_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Address"
+        android:textSize="14sp"
+        android:layout_below="@id/hospital_time_to_get_there"
+        android:layout_toEndOf="@+id/hospital_image"/>
+
+    <TextView
+        android:id="@+id/hospital_phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Phone Number"
+        android:textSize="14sp"
+        android:layout_below="@id/hospital_address"
+        android:layout_toEndOf="@+id/hospital_image"/>
+
 
 </RelativeLayout>

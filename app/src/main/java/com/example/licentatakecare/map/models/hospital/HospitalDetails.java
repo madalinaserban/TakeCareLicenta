@@ -1,5 +1,6 @@
 package com.example.licentatakecare.map.models.hospital;
 
+import com.example.licentatakecare.R;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -71,7 +72,7 @@ public class HospitalDetails {
         public String getPhotoUrl() {
             if (photos != null && photos.size() > 0) {
                 return "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photos.get(0).getPhotoReference() +
-                        "&key=YOUR_API_KEY";
+                        "&key=AIzaSyDHanKxsZf-dj1MjStUejStPo7XoqpIQWo";
             }
             return null;
         }

@@ -1,5 +1,6 @@
 package com.example.licentatakecare.map;
 
+import static android.widget.Toast.LENGTH_LONG;
 import static com.example.licentatakecare.map.util.clusters.ESection.ALL;
 import static com.example.licentatakecare.map.util.clusters.ESection.CARDIOLOGY;
 import static com.example.licentatakecare.map.util.clusters.ESection.EMERGENCY;
@@ -20,16 +21,16 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.databinding.ActivityMapsBinding;
 import com.example.licentatakecare.map.models.cluster.ClusterMarker;
 import com.example.licentatakecare.map.models.hospital.Hospital;
+import com.example.licentatakecare.map.util.TimeandDistance.CalculateDistancesCallback;
 import com.example.licentatakecare.map.util.directions.HospitalDistanceCalculator;
 import com.example.licentatakecare.map.models.directions.Leg;
 import com.example.licentatakecare.map.models.directions.Route;
@@ -57,6 +58,8 @@ import com.google.maps.android.PolyUtil;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, RadioGroup.OnCheckedChangeListener, HospitalsCallback {
@@ -73,7 +76,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private HospitalRouteGenerator mRouteGenerator;
     private ESection mSection = ALL;
     private LatLng latLng;
-    private boolean direction_btn = false;
+    private Hospital closestHospital;
     List<Hospital> hospitalsByDistance = new ArrayList<>();
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
@@ -133,7 +136,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             fragmentManager.popBackStack();
         } else {
             // The directions panel is closed, so we need to open it
-            DirectionsPanelFragment directionsPanelFragment = new DirectionsPanelFragment();
+            DirectionsPanelFragment directionsPanelFragment = DirectionsPanelFragment.newInstance(closestHospital.getGoogle_id(),closestHospital.getTimeToGetThere());
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.directionsPanelContainer, directionsPanelFragment);
             fragmentTransaction.addToBackStack(null);
@@ -154,7 +157,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         mRoutePolylines.clear();
         Hospital closestGreenHospital = hospitalsByDistance.get(0);
-        Hospital closestHospital = hospitalsByDistance.get(0);
+        closestHospital = hospitalsByDistance.get(0);
         for (Hospital hospital : hospitalsByDistance) {
             if (hospital.getAvailability(mSection) > 0.15 * hospital.getTotalSpaces(mSection)) {
                 closestGreenHospital = hospital;
@@ -314,14 +317,41 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mClusterManager.cluster(); // cluster once at the end
     }
 
-
     public void onHospitalsRetrieved(List<Hospital> hospitals) {
         mHospitals = hospitals;
         addHospitalsToMap(mHospitals);
         latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        hospitalsByDistance = calculator.getHospitalsByDistance(latLng, mHospitals);
-        showRouteToNearestHospital();
+
+        calculator.calculateDistancesToHospitals(currentLocation, hospitals, new CalculateDistancesCallback() {
+
+            @Override
+            public void onDistancesCalculated(List<Hospital> hospitalsWithDistances) {
+
+                Collections.sort(hospitalsWithDistances, new Comparator<Hospital>() {
+                    @Override
+                    public int compare(Hospital h1, Hospital h2) {
+                        return Double.compare(h1.getDistance(), h2.getDistance());
+                    }
+                });
+
+
+
+
+                hospitalsByDistance=hospitalsWithDistances;
+                showRouteToNearestHospital();
+
+            }
+
+            @Override
+            public void onDistancesCalculationFailed() {
+
+                Log.d("Hospital", " FAILED "+ " - Distance: " + " FAILED");
+            }
+
+
+        });
     }
+
 
     public void onHospitalUpdated(Hospital hospital) {
         for (ClusterMarker clusterMarker : mClusterMarkers) {

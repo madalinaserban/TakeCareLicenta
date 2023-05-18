@@ -2,12 +2,27 @@ package com.example.licentatakecare.map.models.directions;
 
 import java.util.List;
 
-public class Route implements Comparable<Route> {
+public class Route {
     private Distance distance;
+    private Duration duration;
+    private List<Leg> legs;
 
     public Distance getDistance() {
         return distance;
     }
+
+    public void setDistance(Distance distance) {
+        this.distance = distance;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
     public List<Leg> getLegs() {
         return legs;
     }
@@ -16,9 +31,4 @@ public class Route implements Comparable<Route> {
         this.legs = legs;
     }
 
-    public List<Leg> legs;
-    @Override
-    public int compareTo(Route other) {
-        return this.distance.getValue() - other.getDistance().getValue();
-    }
 }

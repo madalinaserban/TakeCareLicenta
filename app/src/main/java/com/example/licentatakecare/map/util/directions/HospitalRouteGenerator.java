@@ -13,8 +13,6 @@ import com.example.licentatakecare.map.util.directions.callback.DirectionsCallba
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
-import java.util.TreeMap;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

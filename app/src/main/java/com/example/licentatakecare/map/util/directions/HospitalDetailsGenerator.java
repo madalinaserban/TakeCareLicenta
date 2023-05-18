@@ -25,11 +25,11 @@ public class HospitalDetailsGenerator {
                 .create(PlacesApiInterface.class);
     }
 
-    public void displayHospitalDetails(Context mContext, Hospital closestHospital, final DetailsCallback detailsCallback) {
+    public void displayHospitalDetails(Context mContext, String placeId,String time, final DetailsCallback detailsCallback) {
 
         PlacesApiInterface placesApiInterface = createPlacesApi();
 
-        String placeId = closestHospital.getGoogle_id();
+
         String fields = "name,formatted_address,formatted_phone_number,website,opening_hours,rating,photo";
         String url = "https://maps.googleapis.com/maps/api/place/details/json?" +
                 "place_id=" + placeId +

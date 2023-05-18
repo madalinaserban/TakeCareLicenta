@@ -1,8 +1,11 @@
 package com.example.licentatakecare.map.models.directions;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Distance {
 
     public String text;
+    @SerializedName("value")
     public int value;
 
     public String getText() {

@@ -1,57 +1,88 @@
 package com.example.licentatakecare.map.util.directions;
 
-import com.example.licentatakecare.map.models.hospital.Hospital;
-import com.example.licentatakecare.map.models.hospital.Section;
-import com.example.licentatakecare.map.util.clusters.ESection;
-import com.google.android.gms.maps.model.LatLng;
+import android.location.Location;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import com.example.licentatakecare.map.models.directions.Distance;
+import com.example.licentatakecare.map.models.directions.Duration;
+import com.example.licentatakecare.map.models.hospital.Hospital;
+import com.example.licentatakecare.map.util.TimeandDistance.CalculateDistancesCallback;
+import com.example.licentatakecare.map.util.TimeandDistance.DistanceMatrixElement;
+import com.example.licentatakecare.map.util.TimeandDistance.DistanceMatrixResponse;
+import com.example.licentatakecare.map.util.TimeandDistance.DistanceMatrixService;
+
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.TreeMap;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HospitalDistanceCalculator {
+    private static final String BASE_URL = "https://maps.googleapis.com/maps/api/";
+    private static final String API_KEY = "AIzaSyDHanKxsZf-dj1MjStUejStPo7XoqpIQWo";
 
-    public static List<Hospital> getHospitalsByDistance(LatLng userLocation, List<Hospital> hospitals) {
-        List<Hospital> hospitalsByDistance = new ArrayList<>();
+    private DistanceMatrixService distanceMatrixService;
 
+    public HospitalDistanceCalculator() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        distanceMatrixService = retrofit.create(DistanceMatrixService.class);
+    }
+
+    public void calculateDistancesToHospitals(Location userLocation, List<Hospital> hospitals, final CalculateDistancesCallback callback) {
+        // Build the destinations string
+        StringBuilder destinationsBuilder = new StringBuilder();
         for (Hospital hospital : hospitals) {
-            LatLng hospitalLocation = new LatLng(hospital.getGeoPoint().getLatitude(), hospital.getGeoPoint().getLongitude());
-            double distance = distanceBetween(userLocation, hospitalLocation);
-            hospital.setDistance(distance);
-            hospitalsByDistance.add(hospital);
+            destinationsBuilder.append(hospital.getGeoPoint().getLatitude())
+                    .append(",")
+                    .append(hospital.getGeoPoint().getLongitude())
+                    .append("|");
         }
+        String destinations = destinationsBuilder.toString();
 
-        Collections.sort(hospitalsByDistance, new Comparator<Hospital>() {
+        Call<DistanceMatrixResponse> call = distanceMatrixService.getDistanceMatrix(
+                userLocation.getLatitude() + "," + userLocation.getLongitude(),
+                destinations,
+                API_KEY
+        );
+
+        call.enqueue(new Callback<DistanceMatrixResponse>() {
             @Override
-            public int compare(Hospital h1, Hospital h2) {
-                return Double.compare(h1.getDistance(), h2.getDistance());
+            public void onResponse(Call<DistanceMatrixResponse> call, Response<DistanceMatrixResponse> response) {
+                if (response.isSuccessful()) {
+                    DistanceMatrixResponse distanceMatrixResponse = response.body();
+                    if (distanceMatrixResponse != null && distanceMatrixResponse.rows.length > 0) {
+                        DistanceMatrixElement[] elements = distanceMatrixResponse.rows[0].elements;
+                        for (int i = 0; i < elements.length; i++) {
+                            Distance distance = elements[i].distance;
+                            Duration duration = elements[i].duration;
+
+                            Hospital hospital = hospitals.get(i);
+                            hospital.setDistance(distance.value);
+                            hospital.setTimeToGetThere(duration.text);
+                        }
+
+                        callback.onDistancesCalculated(hospitals);
+                    } else {
+                        callback.onDistancesCalculationFailed();
+                    }
+                } else {
+                    callback.onDistancesCalculationFailed();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DistanceMatrixResponse> call, Throwable t) {
+                callback.onDistancesCalculationFailed();
             }
         });
-
-        return hospitalsByDistance;
     }
-
-    private static double distanceBetween(LatLng point1, LatLng point2) {
-        double lat1 = point1.latitude;
-        double lon1 = point1.longitude;
-        double lat2 = point2.latitude;
-        double lon2 = point2.longitude;
-
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = 6371 * c * 1000; // in meters
-
-        return distance;
-    }
-
 }
+
+
+
 

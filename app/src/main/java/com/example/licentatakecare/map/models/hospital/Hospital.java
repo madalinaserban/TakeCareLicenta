@@ -1,5 +1,8 @@
 package com.example.licentatakecare.map.models.hospital;
 
+import android.location.Location;
+
+import com.example.licentatakecare.map.models.directions.Duration;
 import com.example.licentatakecare.map.util.clusters.ESection;
 import com.google.firebase.firestore.GeoPoint;
 
@@ -10,17 +13,25 @@ public class Hospital implements Comparable<Hospital> {
     private GeoPoint geoPoint;
     private String id;
     private String google_id;
-
+    private String timeToGetThere;
+    private HospitalDetails hospitalDetails;
+    private List<Section> sections;
+    private double distance;
     public String getGoogle_id() {
         return google_id;
+    }
+
+    public HospitalDetails getHospitalDetails() {
+        return hospitalDetails;
+    }
+
+    public void setHospitalDetails(HospitalDetails hospitalDetails) {
+        this.hospitalDetails = hospitalDetails;
     }
 
     public void setGoogle_id(String google_id) {
         this.google_id = google_id;
     }
-
-    private List<Section> sections;
-    private double distance;
 
     public double getDistance() {
         return distance;
@@ -36,6 +47,14 @@ public class Hospital implements Comparable<Hospital> {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getTimeToGetThere() {
+        return timeToGetThere;
+    }
+
+    public void setTimeToGetThere(String timeToGetThere) {
+        this.timeToGetThere = timeToGetThere;
     }
 
 
@@ -105,5 +124,6 @@ public class Hospital implements Comparable<Hospital> {
     public int compareTo(Hospital otherHospital) {
         return Double.compare(distance, otherHospital.distance);
     }
+
 
 }
