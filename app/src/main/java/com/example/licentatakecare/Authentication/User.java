@@ -1,4 +1,4 @@
-package com.example.licentatakecare.Authentification;
+package com.example.licentatakecare.Authentication;
 
 public class User {
     String first_name;
@@ -8,6 +8,15 @@ public class User {
     String age;
     String bloodType;
     String gender;
+    String card_id;
+
+    public String getCard_id() {
+        return card_id;
+    }
+
+    public void setCard_id(String card_id) {
+        this.card_id = card_id;
+    }
 
     public User(String first_name, String last_name, String mail, String password, String age, String bloodType, String gender) {
         this.first_name = first_name;

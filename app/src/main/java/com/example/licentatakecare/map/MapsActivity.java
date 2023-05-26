@@ -13,7 +13,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
-import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -24,6 +24,7 @@ import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import com.example.licentatakecare.MainActivity;
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.databinding.ActivityMapsBinding;
 import com.example.licentatakecare.map.models.cluster.ClusterMarker;
@@ -114,7 +115,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     case R.id.directions_button:
                         showDirectionsPanel(closestHospital);
                         return true;
-                    // handle other items here
+                    case R.id.profile_button:
+                        Intent intent = new Intent(MapsActivity.this, MainActivity.class);
+                        startActivity(intent);
+
+                        return true;
                     default:
                         return false;
                 }

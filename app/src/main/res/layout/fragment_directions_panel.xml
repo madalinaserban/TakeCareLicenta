@@ -27,8 +27,8 @@
 
     <RatingBar
         android:id="@+id/hospital_rating"
-        android:layout_width="100dp"
-        android:layout_height="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/hospital_name"
         android:layout_toEndOf="@+id/hospital_image"
         android:isIndicator="true"

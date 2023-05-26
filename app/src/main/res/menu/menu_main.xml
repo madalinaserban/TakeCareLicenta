@@ -4,11 +4,11 @@
         android:icon="@drawable/logo_light"
         android:title="Directions" />
     <item
-        android:id="@+id/navigation_item2"
+        android:id="@+id/profile_button"
         android:icon="@drawable/logo_light"
         android:title="Profile" />
     <item
-        android:id="@+id/navigation_item3"
+        android:id="@+id/hospitals_button"
         android:icon="@drawable/logo_light"
-        android:title="Settings" />
+        android:title="Hospitals" />
 </menu>
