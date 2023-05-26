@@ -5,9 +5,10 @@ import android.content.SharedPreferences;
 import android.util.Pair;
 
 public class SharedPreferencesHelper {
-    private static final String PREF_NAME = "com.example.licentatakecare.Authentication";
+    private static final String PREF_NAME = "user.Authentication";
     private static final String KEY_CARD_ID = "cardId";
     private static final String KEY_PASSWORD = "password";
+    private static final String KEY_IS_LOGGED_IN = "isLoggedIn";
 
     private SharedPreferences sharedPreferences;
 
@@ -19,6 +20,7 @@ public class SharedPreferencesHelper {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_CARD_ID, cardId);
         editor.putString(KEY_PASSWORD, password);
+        editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.apply();
     }
 
@@ -30,4 +32,9 @@ public class SharedPreferencesHelper {
         }
         return null;
     }
+
+    public boolean isLoggedIn() {
+        return sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false);
+    }
 }
+
