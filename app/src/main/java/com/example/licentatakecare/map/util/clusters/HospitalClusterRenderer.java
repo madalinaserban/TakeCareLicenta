@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Looper;
 import android.util.Log;
@@ -43,7 +44,6 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
     private MapsActivity mActivity;
 
     public HospitalClusterRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager,MapsActivity activity)
-    // implements GoogleMap.OnCameraIdleListener
     {
         super(context, map, clusterManager);
         mContext = context;
@@ -56,15 +56,8 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
 
     @Override
     protected void onBeforeClusterItemRendered(ClusterMarker item, MarkerOptions markerOptions) {
-        int transparency = 0; // 0 for completely transparent
 
-// Set the hue value (range: 0.0 - 360.0)
-        float hue = 30.0f;
-
-// Create the marker color with transparency and hue
-        int markerColor = Color.HSVToColor(Color.alpha(transparency), new float[]{hue, 1.0f, 1.0f});
-
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+        markerOptions.icon(getSmallMarkerIcon(getMarkerColor()));
         markerOptions.title(item.getTitle());
         markerOptions.snippet(item.getSnippet());
         Marker marker = mMap.addMarker(markerOptions);
@@ -164,10 +157,32 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         ClusterMarker clusterMarker = (ClusterMarker) marker.getTag();
+        marker.setZIndex(2f);
        Hospital hospital = clusterMarker.getHospital();
         mActivity.showDirectionsPanel(hospital);
+        mActivity.showRouteChosenHospital(hospital);
 
 
         return false;
     }
+    private BitmapDescriptor getSmallMarkerIcon(int color) {
+        // Define the desired width and height for the marker icon
+        int width = 5;
+        int height = 5;
+
+        // Create a Bitmap object with the desired width and height
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        // Create a Paint object to set the color of the marker
+        Paint paint = new Paint();
+        paint.setColor(color);
+
+        // Draw a circle on the canvas with the desired color and size
+        canvas.drawCircle(width / 2, height / 2, width / 2, paint);
+
+        // Return a BitmapDescriptor created from the generated bitmap
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
 }

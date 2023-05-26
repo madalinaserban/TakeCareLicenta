@@ -133,20 +133,51 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //            animator.start();
 //            fragmentManager.popBackStack();
 //        } else {
-            // The directions panel is closed, so we need to open it
-            DirectionsPanelFragment directionsPanelFragment = DirectionsPanelFragment.newInstance(hospital.getGoogle_id(),hospital.getTimeToGetThere());
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.directionsPanelContainer, directionsPanelFragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
-
-            // Animate the expansion of the directions panel
-//            ObjectAnimator animator = ObjectAnimator.ofFloat(findViewById(R.id.directionsPanelContainer), "translationY", -findViewById(R.id.directionsPanelContainer).getHeight());
-//            animator.setDuration(700);
-//            animator.start();
-       // }
+        DirectionsPanelFragment directionsPanelFragment = DirectionsPanelFragment.newInstance(hospital.getGoogle_id(), hospital.getTimeToGetThere());
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.directionsPanelContainer, directionsPanelFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
+    public void showRouteChosenHospital(Hospital hospital) {
+        // Clear existing hospital routes from the map
+        for (Polyline polyline : mRoutePolylines) {
+            if (polyline.getColor() == Color.BLUE)
+                polyline.remove();
+        }
+        if (!(hospital.equals(closestHospital))) {
+            mRouteGenerator.displayDirectionsToHospital(this, currentLocation, hospital, new DirectionsCallback() {
+                @Override
+                public void onSuccess(Route route) {
+                    // Loop through each leg of the route
+                    for (Leg leg : route.getLegs()) {
+
+                        // Loop through each step of the leg
+                        for (Step step : leg.getSteps()) {
+
+                            // Get the polyline of the step and decode it to a list of LatLng points
+                            List<LatLng> points = PolyUtil.decode(String.valueOf(step.getPolyline().getPoints()));
+
+                            // Draw the polyline on the map
+                            PolylineOptions polylineOptions = new PolylineOptions()
+                                    .addAll(points)
+                                    .color(Color.BLUE)
+                                    .width(10);
+                            Polyline polyline = mGoogleMap.addPolyline(polylineOptions);
+                            mRoutePolylines.add(polyline); // Add the polyline to the list
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure() {
+                    // Handle the error here
+                }
+            });
+        }
+
+    }
 
     public void showRouteToNearestHospital() {
         // Clear existing hospital routes from the map
@@ -284,8 +315,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("MapsActivity", "onMapReady");
         mGoogleMap = googleMap;
         mClusterManager = new ClusterManager<>(this, googleMap);
-        mClusterManager.setRenderer(new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager,this));
-        mHospitalClusterRenderer = new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager,this);
+        mClusterManager.setRenderer(new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager, this));
+        mHospitalClusterRenderer = new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager, this);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -333,9 +364,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
 
 
-
-
-                hospitalsByDistance=hospitalsWithDistances;
+                hospitalsByDistance = hospitalsWithDistances;
                 showRouteToNearestHospital();
 
             }
@@ -343,7 +372,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onDistancesCalculationFailed() {
 
-                Log.d("Hospital", " FAILED "+ " - Distance: " + " FAILED");
+                Log.d("Hospital", " FAILED " + " - Distance: " + " FAILED");
             }
 
 
