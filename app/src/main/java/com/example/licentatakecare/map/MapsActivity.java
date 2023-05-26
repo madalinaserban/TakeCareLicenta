@@ -133,7 +133,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //            animator.start();
 //            fragmentManager.popBackStack();
 //        } else {
-        DirectionsPanelFragment directionsPanelFragment = DirectionsPanelFragment.newInstance(hospital.getGoogle_id(), hospital.getTimeToGetThere());
+        DirectionsPanelFragment directionsPanelFragment = DirectionsPanelFragment.newInstance(hospital);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.directionsPanelContainer, directionsPanelFragment);
         fragmentTransaction.addToBackStack(null);

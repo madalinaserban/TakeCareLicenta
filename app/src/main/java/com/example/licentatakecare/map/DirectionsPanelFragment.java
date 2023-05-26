@@ -1,6 +1,8 @@
 package com.example.licentatakecare.map;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -10,9 +12,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -34,8 +38,11 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
     private TextView hospitalTimeToGetThere;
     private TextView hospitalNumber;
     private TextView hospitalAdress;
+    private TextView hospitalDistance;
     private String s_hospitalGoogleId;
+    private String s_hospitalDistance;
     private String s_hospitalTime;
+    public static Hospital mHospital;
 
     private HospitalDetailsGenerator hospitalDetailsGenerator;
 
@@ -43,11 +50,13 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
         // Required empty public constructor
     }
 
-    public static DirectionsPanelFragment newInstance(String hospitalGoogle_Id,String hospitalTime) {
+    public static DirectionsPanelFragment newInstance(Hospital hospital) {
         DirectionsPanelFragment fragment = new DirectionsPanelFragment();
         Bundle args = new Bundle();
-        args.putString("hospitalGoogleId", hospitalGoogle_Id);
-        args.putString("hospitalTime", hospitalTime);
+        args.putString("hospitalGoogleId", hospital.getGoogle_id());
+        args.putString("hospitalTime", hospital.getTimeToGetThere());
+        args.putString("hospitalDistance", String.valueOf(hospital.getDistance()/ 1000.0));
+        mHospital = hospital;
         fragment.setArguments(args);
         return fragment;
     }
@@ -62,9 +71,10 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
         hospitalName = view.findViewById(R.id.hospital_name);
         hospitalRating = view.findViewById(R.id.hospital_rating);
         hospitalOpeningHours = view.findViewById(R.id.hospital_opening_hours);
-        hospitalTimeToGetThere = view.findViewById(R.id.hospital_time_to_get_there);
-        hospitalNumber=view.findViewById(R.id.hospital_phone);
-        hospitalAdress=view.findViewById(R.id.hospital_address);
+        hospitalTimeToGetThere = view.findViewById(R.id.time_to_get_there_value);
+        hospitalNumber = view.findViewById(R.id.hospital_phone);
+        hospitalAdress = view.findViewById(R.id.address_value);
+        hospitalDistance = view.findViewById(R.id.distance_value);
 
         // hospitalDirections = view.findViewById(R.id.hospital_directions);
 
@@ -73,18 +83,36 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
         if (args != null) {
             s_hospitalGoogleId = args.getString("hospitalGoogleId");
             s_hospitalTime = args.getString("hospitalTime");
-            fetchHospitalDetails(s_hospitalGoogleId,s_hospitalTime);
+            s_hospitalDistance = args.getString("hospitalDistance");
+            fetchHospitalDetails(s_hospitalGoogleId, s_hospitalTime);
         }
+        ImageButton directionsButton = view.findViewById(R.id.directions_button);
+        directionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Launch Google Maps with directions intent
+                String latitude = String.valueOf(mHospital.getGeoPoint().getLatitude());
+                String longitude = String.valueOf(mHospital.getGeoPoint().getLongitude());
+                String label = mHospital.getName();
+
+                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + latitude + "," + longitude + "&label=" + label);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+
+                if (mapIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
+                    startActivity(mapIntent);
+                } else {
+                    Toast.makeText(getContext(), "Google maps is not installed", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         return view;
     }
 
-    private void fetchHospitalDetails(String s_hospitalGoogleId, String s_hospitalTime ) {
+    private void fetchHospitalDetails(String s_hospitalGoogleId, String s_hospitalTime) {
         hospitalDetailsGenerator = new HospitalDetailsGenerator();
-
-        // Make the API call to fetch hospital details
-        // Create a Hospital object with the name
-        hospitalDetailsGenerator.displayHospitalDetails(getContext(), s_hospitalGoogleId, s_hospitalTime,this);
+        hospitalDetailsGenerator.displayHospitalDetails(getContext(), s_hospitalGoogleId, s_hospitalTime, this);
     }
 
     @Override
@@ -92,8 +120,8 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
         // Update the UI with the retrieved data
         hospitalName.setText(name);
         hospitalRating.setRating((float) rating);
-        hospitalOpeningHours.setText(isOpen ? "Open Now: Yes" : "Open Now: No");
-        hospitalTimeToGetThere.setText("Time :"+s_hospitalTime);
+        hospitalTimeToGetThere.setText(s_hospitalTime);
+        hospitalDistance.setText(s_hospitalDistance+" km");
         hospitalAdress.setText(address);
         hospitalNumber.setText(phone);
 
