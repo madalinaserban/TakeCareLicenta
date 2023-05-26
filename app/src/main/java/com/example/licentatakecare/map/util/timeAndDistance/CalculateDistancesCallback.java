@@ -1,4 +1,4 @@
-package com.example.licentatakecare.map.util.TimeandDistance;
+package com.example.licentatakecare.map.util.timeAndDistance;
 
 import com.example.licentatakecare.map.models.hospital.Hospital;
 

@@ -1,6 +1,5 @@
 package com.example.licentatakecare.map;
 
-import static android.widget.Toast.LENGTH_LONG;
 import static com.example.licentatakecare.map.util.clusters.ESection.ALL;
 import static com.example.licentatakecare.map.util.clusters.ESection.CARDIOLOGY;
 import static com.example.licentatakecare.map.util.clusters.ESection.EMERGENCY;
@@ -24,13 +23,12 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.databinding.ActivityMapsBinding;
 import com.example.licentatakecare.map.models.cluster.ClusterMarker;
 import com.example.licentatakecare.map.models.hospital.Hospital;
-import com.example.licentatakecare.map.util.TimeandDistance.CalculateDistancesCallback;
+import com.example.licentatakecare.map.util.timeAndDistance.CalculateDistancesCallback;
 import com.example.licentatakecare.map.util.directions.HospitalDistanceCalculator;
 import com.example.licentatakecare.map.models.directions.Leg;
 import com.example.licentatakecare.map.models.directions.Route;
@@ -114,7 +112,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.directions_button:
-                        showDirectionsPanel();
+                        showDirectionsPanel(closestHospital);
                         return true;
                     // handle other items here
                     default:
@@ -125,28 +123,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    public void showDirectionsPanel() {
+    public void showDirectionsPanel(Hospital hospital) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.directionsPanelContainer);
-        if (currentFragment != null) {
-            // The directions panel is already open, so we need to collapse it
-            ObjectAnimator animator = ObjectAnimator.ofFloat(findViewById(R.id.directionsPanelContainer), "translationY", 0);
-            animator.setDuration(700);
-            animator.start();
-            fragmentManager.popBackStack();
-        } else {
+//        if (currentFragment != null) {
+//            // The directions panel is already open, so we need to collapse it
+//            ObjectAnimator animator = ObjectAnimator.ofFloat(findViewById(R.id.directionsPanelContainer), "translationY", 0);
+//            animator.setDuration(700);
+//            animator.start();
+//            fragmentManager.popBackStack();
+//        } else {
             // The directions panel is closed, so we need to open it
-            DirectionsPanelFragment directionsPanelFragment = DirectionsPanelFragment.newInstance(closestHospital.getGoogle_id(),closestHospital.getTimeToGetThere());
+            DirectionsPanelFragment directionsPanelFragment = DirectionsPanelFragment.newInstance(hospital.getGoogle_id(),hospital.getTimeToGetThere());
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.directionsPanelContainer, directionsPanelFragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
 
             // Animate the expansion of the directions panel
-            ObjectAnimator animator = ObjectAnimator.ofFloat(findViewById(R.id.directionsPanelContainer), "translationY", -findViewById(R.id.directionsPanelContainer).getHeight());
-            animator.setDuration(700);
-            animator.start();
-        }
+//            ObjectAnimator animator = ObjectAnimator.ofFloat(findViewById(R.id.directionsPanelContainer), "translationY", -findViewById(R.id.directionsPanelContainer).getHeight());
+//            animator.setDuration(700);
+//            animator.start();
+       // }
     }
 
 
@@ -286,8 +284,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("MapsActivity", "onMapReady");
         mGoogleMap = googleMap;
         mClusterManager = new ClusterManager<>(this, googleMap);
-        mClusterManager.setRenderer(new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager));
-        mHospitalClusterRenderer = new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager);
+        mClusterManager.setRenderer(new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager,this));
+        mHospitalClusterRenderer = new HospitalClusterRenderer(getApplicationContext(), mGoogleMap, mClusterManager,this);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {

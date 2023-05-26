@@ -1,8 +1,6 @@
-package com.example.licentatakecare.map.util.TimeandDistance;
+package com.example.licentatakecare.map.util.timeAndDistance;
 
 import com.google.gson.annotations.SerializedName;
-import com.google.maps.model.Distance;
-import com.google.maps.model.Duration;
 
 
 public class DistanceMatrixResponse {

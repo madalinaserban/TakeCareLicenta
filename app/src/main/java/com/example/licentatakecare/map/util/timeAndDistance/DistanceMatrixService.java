@@ -1,4 +1,4 @@
-package com.example.licentatakecare.map.util.TimeandDistance;
+package com.example.licentatakecare.map.util.timeAndDistance;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
