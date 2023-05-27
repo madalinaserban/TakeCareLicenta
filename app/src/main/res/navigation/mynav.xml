@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mynav"
-    app:startDestination="@id/loginFragment">
+    app:startDestination="@id/logoFragment">
 
     <fragment
         android:id="@+id/loginFragment"
@@ -17,5 +17,18 @@
         android:id="@+id/profileFragment"
         android:name="com.example.licentatakecare.Authentication.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+    </fragment>
+    <fragment
+        android:id="@+id/logoFragment"
+        android:name="com.example.licentatakecare.Authentication.LogoFragment"
+        android:label="fragment_logo"
+        tools:layout="@layout/fragment_logo" >
+        <action
+            android:id="@+id/action_logoFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_logoFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
 </navigation>
