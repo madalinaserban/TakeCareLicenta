@@ -1,4 +1,4 @@
-package com.example.licentatakecare.Authentication;
+package com.example.licentatakecare.Authentication.userData;
 
 public class User {
     String first_name;
@@ -6,6 +6,16 @@ public class User {
     String mail;
     String password;
     String age;
+    String date_of_birth;
+
+    public String getDate_of_birth() {
+        return date_of_birth;
+    }
+
+    public void setDate_of_birth(String date_of_birth) {
+        this.date_of_birth = date_of_birth;
+    }
+
     String bloodType;
     String gender;
     String card_id;
@@ -18,12 +28,12 @@ public class User {
         this.card_id = card_id;
     }
 
-    public User(String first_name, String last_name, String mail, String password, String age, String bloodType, String gender) {
+    public User(String first_name, String last_name, String mail, String password, String date_of_birth, String bloodType, String gender) {
         this.first_name = first_name;
         this.last_name = last_name;
         this.mail = mail;
         this.password = password;
-        this.age = age;
+        this.date_of_birth = date_of_birth;;
         this.bloodType = bloodType;
         this.gender = gender;
     }

@@ -33,6 +33,10 @@ public class SharedPreferencesHelper {
         return null;
     }
 
+    public String getCardId() {
+        return sharedPreferences.getString(KEY_CARD_ID, null);
+    }
+
     public boolean isLoggedIn() {
         return sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false);
     }

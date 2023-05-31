@@ -1,10 +1,8 @@
 package com.example.licentatakecare.Authentication;
 
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-
 import android.os.Looper;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -40,7 +38,15 @@ public class LogoFragment extends Fragment {
             public void run() {
                 if (sharedPreferencesHelper.isLoggedIn()) {
                     Toast.makeText(getContext(), "Navigating to Profile", Toast.LENGTH_LONG).show();
-                    Navigation.findNavController(requireView()).navigate(R.id.action_logoFragment_to_profileFragment);
+
+                    // Pass the ID as an argument
+                    Bundle bundle = new Bundle();
+                    bundle.putString("userCardId", sharedPreferencesHelper.getCardId());
+
+                    ProfileFragment profileFragment = new ProfileFragment();
+                    profileFragment.setArguments(bundle);
+
+                    Navigation.findNavController(requireView()).navigate(R.id.action_logoFragment_to_profileFragment, bundle);
                 } else {
                     Toast.makeText(getContext(), "Navigating to Login", Toast.LENGTH_LONG).show();
                     Navigation.findNavController(requireView()).navigate(R.id.action_logoFragment_to_loginFragment);
@@ -48,6 +54,7 @@ public class LogoFragment extends Fragment {
             }
         }, DELAY_DURATION);
     }
+
 
     @Override
     public void onDestroyView() {

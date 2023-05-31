@@ -1,17 +1,69 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Authentication.ProfileFragment">
+    android:orientation="vertical">
+
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="PROFIL"
-        android:textColor="@color/dark_blue"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_gravity="center" />
+        android:padding="16dp"
+        android:text="Profile"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/profile_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Name: John Doe" />
+
+    <TextView
+        android:id="@+id/profile_date_of_birth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Date of Birth: 15th May 1985" />
+
+    <TextView
+        android:id="@+id/profile_age"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Age: 38" />
+
+    <TextView
+        android:id="@+id/profile_card_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Card ID: 1234567890" />
+
+    <TextView
+        android:id="@+id/profile_blood_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Blood Type: O+" />
+
+    <TextView
+        android:id="@+id/profile_gender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Gender: Male" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Allergies:" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/allergiesRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" />
 
 
-</FrameLayout>
+</LinearLayout>
