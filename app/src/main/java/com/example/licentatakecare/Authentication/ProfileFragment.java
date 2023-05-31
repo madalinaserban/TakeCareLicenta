@@ -89,10 +89,10 @@ public class ProfileFragment extends Fragment {
                         String bloodType = snapshot.getString("blood_type");
                         List<DocumentReference> allergyReferences = (List<DocumentReference>) snapshot.get("allergies");
                         tv_userName.setText(first_name + " " + last_name);
-                        tv_userCardId.setText(userId);
-                        tv_userBloodType.setText(bloodType);
+                        tv_userCardId.setText("ID: "+ userId);
+                        tv_userBloodType.setText("Blood type: "+bloodType);
                         tv_userDateOfBirth.setText(dateOfBirth);
-                        tv_userAge.setText("21");
+                        tv_userAge.setText("Age: 21");
 
                         List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
                         for (DocumentReference reference : allergyReferences) {

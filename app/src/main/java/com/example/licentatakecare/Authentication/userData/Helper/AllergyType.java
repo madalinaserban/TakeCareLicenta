@@ -4,6 +4,6 @@ public enum AllergyType {
     MEDICINE,
     SEASONAL,
     FOOD,
-    SEAFOOD
+    ANIMAL
 
 }
