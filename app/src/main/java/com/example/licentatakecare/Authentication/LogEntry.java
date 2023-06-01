@@ -11,12 +11,22 @@ public class LogEntry {
     private String section;
     @PropertyName("hospital")
     private String hospital;
+    private String timeDifference;
 
-    public LogEntry(String entryTimestamp, String exitTimestamp, String section, String hospital) {
+    public String getTimeDifference() {
+        return timeDifference;
+    }
+
+    public void setTimeDifference(String time) {
+        this.timeDifference = time;
+    }
+
+    public LogEntry(String entryTimestamp, String exitTimestamp, String section, String hospital, String time) {
         this.entryTimestamp = entryTimestamp;
         this.exitTimestamp = exitTimestamp;
         this.section = section;
         this.hospital = hospital;
+        this.timeDifference=time;
     }
 
     public String getEntryTimestamp() {

@@ -16,7 +16,7 @@ public class LogoFragment extends Fragment {
     private FragmentLogoBinding binding;
     private SharedPreferencesHelper sharedPreferencesHelper;
 
-    private static final long DELAY_DURATION = 2000; // Delay in milliseconds
+    private static final long DELAY_DURATION = 1000; // Delay in milliseconds
 
     @Override
     public void onStart() {

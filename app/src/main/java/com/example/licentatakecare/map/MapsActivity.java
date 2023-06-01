@@ -106,7 +106,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         HospitalsDao.getHospitalList(this);
         mSavedInstanceState = savedInstanceState;
         //Get location
-        getLocation();
+        if (savedInstanceState != null) {
+            Location currentLocation = savedInstanceState.getParcelable("userLocation");
+
+            // Restore other necessary data or variables here
+        } else {
+            getLocation();
+        }
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -418,6 +424,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 getLocation();
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("userLocation", currentLocation);
     }
 
 

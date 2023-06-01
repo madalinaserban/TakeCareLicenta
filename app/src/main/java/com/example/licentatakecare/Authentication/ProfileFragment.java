@@ -2,6 +2,9 @@ package com.example.licentatakecare.Authentication;
 
 import static androidx.fragment.app.FragmentManager.TAG;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,12 +17,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.licentatakecare.Authentication.userData.Adapters.AllergiesAdapter;
 import com.example.licentatakecare.Authentication.userData.Adapters.LogAdapter;
 import com.example.licentatakecare.Authentication.userData.Allergy;
 import com.example.licentatakecare.R;
+import com.example.licentatakecare.map.MapsActivity;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
@@ -31,12 +38,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,6 +54,7 @@ import java.util.Locale;
 public class ProfileFragment extends Fragment {
     private FirebaseFirestore db;
     private DatabaseReference userCardRef;
+    private View view;
     private String userId;
     private TextView tv_userName;
     private TextView tv_userDateOfBirth;
@@ -54,6 +64,7 @@ public class ProfileFragment extends Fragment {
     private TextView tv_userGender;
     private RecyclerView rv_allergiesRecyclerView;
     private RecyclerView rv_logRecyclerView;
+    private LinearLayout toolbarButtonsLayout;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -62,6 +73,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         db = FirebaseFirestore.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         userCardRef = database.getReference("UserCard");
@@ -70,7 +82,49 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+
+        view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        toolbarButtonsLayout = view.findViewById(R.id.toolbarButtonsLayout);
+        toolbarButtonsLayout.setOrientation(LinearLayout.VERTICAL);
+        ImageView expandButton = view.findViewById(R.id.expandButton);
+        expandButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleButtonsLayoutVisibility();
+            }
+        });
+
+        Button signOutButton = view.findViewById(R.id.signOutButton);
+        signOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Clear shared preferences
+                SharedPreferences preferences = getActivity().getSharedPreferences("user.Authentication", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.clear();
+                editor.apply();
+
+                // Go back to map activity
+                Intent intent = new Intent(getActivity(), MapsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        });
+
+        Button backToMapButton = view.findViewById(R.id.backToMapButton);
+        backToMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), MapsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        });
+
+        return view;
     }
 
     @Override
@@ -120,6 +174,7 @@ public class ProfileFragment extends Fragment {
                     String age = ageCalculator(dateOfBirth);
                     tv_userAge.setText(age);
                     tv_userGender.setText(gender);
+
 
                     List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
                     for (DocumentReference reference : allergyReferences) {
@@ -181,8 +236,34 @@ public class ProfileFragment extends Fragment {
                                 String exitTimestamp = entrySnapshot.child("exit_timestamp").getValue(String.class);
                                 String section = entrySnapshot.child("section").getValue(String.class);
                                 String hospital = entrySnapshot.child("hospital").getValue(String.class);
+                                LocalDateTime entryDateTime = LocalDateTime.parse(entryTimestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                                LocalDateTime exitDateTime = LocalDateTime.parse(exitTimestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-                                LogEntry logEntry = new LogEntry(entryTimestamp, exitTimestamp, section, hospital);
+                                long durationInMillis = ChronoUnit.MILLIS.between(entryDateTime, exitDateTime);
+
+                                long days = durationInMillis / (1000 * 60 * 60 * 24);
+                                long hours = (durationInMillis / (1000 * 60 * 60)) % 24;
+                                long minutes = (durationInMillis / (1000 * 60)) % 60;
+
+                                String timeDifference;
+                                if (days > 0) {
+                                    timeDifference = String.format(Locale.getDefault(), "%d day(s) %d hours %2 minutes", days, hours, minutes);
+                                } else {
+                                    if (hours > 1) {
+                                        if (minutes >= 1) {
+                                            timeDifference = String.format(Locale.getDefault(), "%d hours %d minute(s)", hours, minutes);
+                                        } else {
+                                            timeDifference = String.format(Locale.getDefault(), "%d hours", hours);
+                                        }
+                                    } else {
+                                        timeDifference = String.format(Locale.getDefault(), "%d hour %d minutes", hours, minutes);
+                                    }
+                                }
+
+                                String time = timeDifference;
+
+
+                                LogEntry logEntry = new LogEntry(entryTimestamp, exitTimestamp, section, hospital, time);
                                 logList.add(logEntry);
                             }
 
@@ -230,4 +311,11 @@ public class ProfileFragment extends Fragment {
         return ""; // Return an empty string if parsing fails
     }
 
+    private void toggleButtonsLayoutVisibility() {
+        if (toolbarButtonsLayout.getVisibility() == View.VISIBLE) {
+            toolbarButtonsLayout.setVisibility(View.GONE);
+        } else {
+            toolbarButtonsLayout.setVisibility(View.VISIBLE);
+        }
+    }
 }

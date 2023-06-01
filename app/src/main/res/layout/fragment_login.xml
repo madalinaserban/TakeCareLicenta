@@ -118,18 +118,18 @@
                 android:backgroundTint="@color/black"/>
         </androidx.cardview.widget.CardView>
         <Button
-            android:id="@+id/btn_forgot_password"
+            android:id="@+id/btn_back_to_map"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
-            android:text="Forgot password?"
-            android:textColor="@color/white"
-            android:textAllCaps="false"
-            android:background="@android:color/transparent"
-            android:elevation="0dp"
-            app:layout_constraintEnd_toEndOf="@+id/cv_container"
-            app:layout_constraintTop_toBottomOf="@id/cv_container"></Button>
+            android:text="Back to Map"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/rememberme"
+            app:layout_constraintHorizontal_bias="0.285"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cv_container"
+            app:layout_constraintVertical_bias="0.508" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
@@ -141,7 +141,7 @@
             app:cardCornerRadius="25dp"
             app:cardElevation="8dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_forgot_password"/>
+            app:layout_constraintTop_toBottomOf="@id/btn_back_to_map"/>
 
         <ImageView
             android:id="@+id/imageView"
@@ -160,12 +160,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="17dp"
             android:text="Remember Me"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_forgot_password"
-            app:layout_constraintHorizontal_bias="0.285"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cv_container"
-            app:layout_constraintVertical_bias="0.508" />
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            android:background="@android:color/transparent"
+            android:elevation="0dp"
+            app:layout_constraintEnd_toEndOf="@+id/cv_container"
+            app:layout_constraintTop_toBottomOf="@id/cv_container"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

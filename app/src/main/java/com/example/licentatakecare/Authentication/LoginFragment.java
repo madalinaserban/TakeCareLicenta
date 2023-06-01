@@ -1,12 +1,14 @@
 package com.example.licentatakecare.Authentication;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,6 +20,7 @@ import androidx.navigation.Navigation;
 
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.databinding.FragmentLoginBinding;
+import com.example.licentatakecare.map.MapsActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -37,6 +40,7 @@ public class LoginFragment extends Fragment {
     private SharedPreferencesHelper sharedPreferencesHelper;
     private FirebaseFirestore db;
     private CheckBox checkBox;
+    private Button backToMap;
 
     @Nullable
     @Override
@@ -48,6 +52,16 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 signInUser();
+            }
+        });
+        backToMap=binding.btnBackToMap;
+        backToMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), MapsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                getActivity().finish();
             }
         });
         return binding.getRoot();
