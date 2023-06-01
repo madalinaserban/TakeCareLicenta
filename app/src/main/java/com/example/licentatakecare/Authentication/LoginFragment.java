@@ -83,7 +83,6 @@ public class LoginFragment extends Fragment {
                                     calendar.setTime(birthDate);
                                     int year = calendar.get(Calendar.YEAR);
                                     if (String.valueOf(year).equals(password)) {
-                                        Toast.makeText(getContext(), "YEY", Toast.LENGTH_LONG).show();
                                         if (checkBox.isChecked()) {
                                             sharedPreferencesHelper.saveUserCredentials(cardId, password);
                                         }

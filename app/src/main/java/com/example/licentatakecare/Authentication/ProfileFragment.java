@@ -32,9 +32,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 public class ProfileFragment extends Fragment {
     private FirebaseFirestore db;
@@ -105,12 +111,15 @@ public class ProfileFragment extends Fragment {
                     String last_name = snapshot.getString("last_name");
                     String dateOfBirth = snapshot.getString("birth_date");
                     String bloodType = snapshot.getString("blood_type");
+                    String gender = snapshot.getString("gender");
                     List<DocumentReference> allergyReferences = (List<DocumentReference>) snapshot.get("allergies");
                     tv_userName.setText(first_name + " " + last_name);
                     tv_userCardId.setText("ID: " + userId);
                     tv_userBloodType.setText("Blood type: " + bloodType);
                     tv_userDateOfBirth.setText(dateOfBirth);
-                    tv_userAge.setText("Age: 21");
+                    String age = ageCalculator(dateOfBirth);
+                    tv_userAge.setText(age);
+                    tv_userGender.setText(gender);
 
                     List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
                     for (DocumentReference reference : allergyReferences) {
@@ -190,6 +199,35 @@ public class ProfileFragment extends Fragment {
                 Log.d("TAG", "Error retrieving user data: " + databaseError.getMessage());
             }
         });
+    }
+
+    public String ageCalculator(String birthdate) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+
+        try {
+            // Parse the birthdate string into a Date object
+            Date birthdateDate = dateFormat.parse(birthdate);
+
+            // Convert the Date object to a LocalDate object
+            LocalDate birthdateObj = birthdateDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            // Get the current date
+            LocalDate currentDate = LocalDate.now();
+
+            // Calculate the age
+            Period age = Period.between(birthdateObj, currentDate);
+
+            // Convert the age to a string representation
+            String ageString = String.valueOf(age.getYears());
+
+            // Return the age as a string
+            return ageString;
+        } catch (ParseException e) {
+            // Handle parsing exception
+            e.printStackTrace();
+        }
+
+        return ""; // Return an empty string if parsing fails
     }
 
 }

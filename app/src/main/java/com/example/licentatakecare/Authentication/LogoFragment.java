@@ -37,7 +37,6 @@ public class LogoFragment extends Fragment {
             @Override
             public void run() {
                 if (sharedPreferencesHelper.isLoggedIn()) {
-                    Toast.makeText(getContext(), "Navigating to Profile", Toast.LENGTH_LONG).show();
 
                     // Pass the ID as an argument
                     Bundle bundle = new Bundle();
@@ -48,7 +47,6 @@ public class LogoFragment extends Fragment {
 
                     Navigation.findNavController(requireView()).navigate(R.id.action_logoFragment_to_profileFragment, bundle);
                 } else {
-                    Toast.makeText(getContext(), "Navigating to Login", Toast.LENGTH_LONG).show();
                     Navigation.findNavController(requireView()).navigate(R.id.action_logoFragment_to_loginFragment);
                 }
             }
