@@ -1,4 +1,3 @@
-<!-- item_allergy.xml -->
 <LinearLayout
     android:id="@+id/linear_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"

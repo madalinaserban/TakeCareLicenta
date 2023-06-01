@@ -87,7 +87,12 @@ public class LoginFragment extends Fragment {
                                         if (checkBox.isChecked()) {
                                             sharedPreferencesHelper.saveUserCredentials(cardId, password);
                                         }
-                                        Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_profileFragment);
+                                        Bundle bundle = new Bundle();
+                                        bundle.putString("userCardId", cardId);
+
+                                        ProfileFragment profileFragment = new ProfileFragment();
+                                        profileFragment.setArguments(bundle);
+                                        Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_profileFragment,bundle);
                                     }
                                 } catch (ParseException e) {
                                     e.printStackTrace();
