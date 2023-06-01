@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,66 +10,56 @@
         android:id="@+id/horizontal_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true"
-        android:scrollbars="none"
         android:background="@color/nude"
+        android:fillViewport="true"
         android:overScrollMode="never"
-        app:layout_constraintTop_toTopOf="parent"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <RadioGroup
             android:id="@+id/radio_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="5dp">
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
             <RadioButton
                 android:id="@+id/button_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:backgroundTint="#33539E"
                 android:layout_marginStart="5dp"
-                android:background = "@drawable/round_button"
+                android:background="@drawable/round_button"
                 android:text="All"
-                />
+                app:backgroundTint="#33539E" />
 
             <RadioButton
                 android:id="@+id/button_radiology"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:background = "@drawable/round_button"
-                app:backgroundTint="#7FACD6"
-                android:text="Radiology" />
+                android:background="@drawable/round_button"
+                android:text="Radiology"
+                app:backgroundTint="#7FACD6" />
 
             <RadioButton
                 android:id="@+id/button_emergency"
                 android:layout_width="wrap_content"
-                android:layout_marginStart="5dp"
                 android:layout_height="wrap_content"
-                android:background = "@drawable/round_button"
-                app:backgroundTint="#BFB8DA"
-                android:text="Emergency" />
+                android:layout_marginStart="5dp"
+                android:background="@drawable/round_button"
+                android:text="Emergency"
+                app:backgroundTint="#BFB8DA" />
 
             <RadioButton
                 android:id="@+id/button_cardiology"
                 android:layout_width="wrap_content"
-                android:layout_marginStart="5dp"
                 android:layout_height="wrap_content"
-                app:backgroundTint="#E8B7D4"
-                android:background = "@drawable/round_button"
-                android:text="Cardiology" />
-
-            <RadioButton
-                android:id="@+id/button_random"
-                android:layout_width="wrap_content"
                 android:layout_marginStart="5dp"
-                android:layout_height="wrap_content"
-                android:background = "@drawable/round_button"
-                app:backgroundTint="#A5678E"
-                android:text="TO DO" />
-            <!-- Add more buttons as needed -->
+                android:background="@drawable/round_button"
+                android:text="Cardiology"
+                app:backgroundTint="#E8B7D4" />
         </RadioGroup>
     </HorizontalScrollView>
 
@@ -78,36 +67,42 @@
         android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/horizontal_scroll_view"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/horizontal_scroll_view">
 
 
         <androidx.fragment.app.FragmentContainerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:id="@+id/maps"
             android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:id="@+id/maps" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
-            android:background="@color/nude"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:menu="@menu/menu_main"
+            android:background="@color/nude"
             app:itemIconTint="@drawable/bottom_nav_color_state"
-            app:itemTextColor="@drawable/bottom_nav_color_state" />
+            app:itemTextColor="@drawable/bottom_nav_color_state"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:menu="@menu/menu_main" />
+
         <FrameLayout
             android:id="@+id/directionsPanelContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_alignParentBottom="true" />
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <include
+            layout="@layout/fragment_error"
+            android:visibility="gone" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

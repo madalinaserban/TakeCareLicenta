@@ -13,17 +13,24 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
+import com.example.licentatakecare.InternetConnectivityChecker;
 import com.example.licentatakecare.MainActivity;
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.databinding.ActivityMapsBinding;
@@ -61,7 +68,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, RadioGroup.OnCheckedChangeListener, HospitalsCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, RadioGroup.OnCheckedChangeListener, HospitalsCallback, InternetConnectivityChecker.InternetConnectivityListener {
 
     private static final int REQUEST_CODE = 101;
     private GoogleMap mGoogleMap;
@@ -75,7 +82,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private HospitalRouteGenerator mRouteGenerator;
     private ESection mSection = ALL;
     private LatLng latLng;
+    private View overlayLayout;
+    private BottomNavigationView bottomNavigationView;
+    private InternetConnectivityChecker connectivityChecker;
     private Hospital closestHospital;
+    private ErrorFragment errorFragment;
     List<Hospital> hospitalsByDistance = new ArrayList<>();
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
@@ -94,16 +105,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        connectivityChecker = new InternetConnectivityChecker(this, this);
+        connectivityChecker.start();
+        // Show the error fragment initially
         RadioGroup radioGroup = findViewById(R.id.radio_group);
         mRouteGenerator = new HospitalRouteGenerator();
         btn_all = findViewById(R.id.button_all);
         btn_all.setChecked(true);
         radioGroup.setOnCheckedChangeListener(this);
+        overlayLayout = findViewById(R.id.overlayLayout);
         // Get database
         db = FirebaseFirestore.getInstance();
         FrameLayout directionsPanelContainer = findViewById(R.id.directionsPanelContainer);
         fusedClient = LocationServices.getFusedLocationProviderClient(this);
-        HospitalsDao.getHospitalList(this);
+        if (isNetworkAvailable()) {
+            HospitalsDao.getHospitalList(this);
+        }
         mSavedInstanceState = savedInstanceState;
         //Get location
         if (savedInstanceState != null) {
@@ -113,7 +130,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             getLocation();
         }
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -187,7 +204,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
         }
-
     }
 
     public void showRouteToNearestHospital() {
@@ -287,10 +303,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d("RadioGroup", mSection.toString());
                 break;
         }
-
-        // Redraw the hospital routes
-        showRouteToNearestHospital();
-        mHospitalClusterRenderer.updateMarker(mSection, mClusterMarkers);
+        if (isNetworkAvailable()) {
+            // Redraw the hospital routes
+            showRouteToNearestHospital();
+            mHospitalClusterRenderer.updateMarker(mSection, mClusterMarkers);
+        }
 
 
     }
@@ -303,23 +320,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            {
-                mWaitingForPermission = true;
-                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
-            }
-
+            mWaitingForPermission = true;
+            ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
         } else {
-            Task<Location> task = fusedClient.getLastLocation();
-            task.addOnSuccessListener(location -> {
-                if (location != null) {
-                    currentLocation = location;
-                    SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.maps);
-                    assert supportMapFragment != null;
-                    supportMapFragment.getMapAsync(MapsActivity.this);
-                }
-            });
+            // Check for internet connectivity
+            if (isNetworkAvailable()) {
+                Task<Location> task = fusedClient.getLastLocation();
+                task.addOnSuccessListener(location -> {
+                    if (location != null) {
+                        currentLocation = location;
+                        SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.maps);
+                        assert supportMapFragment != null;
+                        supportMapFragment.getMapAsync(MapsActivity.this);
+                    }
+                });
+            } else {
+                // Handle no internet connection
+                Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show();
+            }
         }
     }
+
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -345,6 +366,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Assign the GoogleMap object to the member variable
         mGoogleMap = googleMap;
+
     }
 
     public void addHospitalsToMap(List<Hospital> hospitals) {
@@ -358,36 +380,38 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void onHospitalsRetrieved(List<Hospital> hospitals) {
-        mHospitals = hospitals;
-        addHospitalsToMap(mHospitals);
-        latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        if (isNetworkAvailable()) {
+            mHospitals = hospitals;
+            addHospitalsToMap(mHospitals);
+            latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
-        calculator.calculateDistancesToHospitals(currentLocation, hospitals, new CalculateDistancesCallback() {
+            calculator.calculateDistancesToHospitals(currentLocation, hospitals, new CalculateDistancesCallback() {
 
-            @Override
-            public void onDistancesCalculated(List<Hospital> hospitalsWithDistances) {
+                @Override
+                public void onDistancesCalculated(List<Hospital> hospitalsWithDistances) {
 
-                Collections.sort(hospitalsWithDistances, new Comparator<Hospital>() {
-                    @Override
-                    public int compare(Hospital h1, Hospital h2) {
-                        return Double.compare(h1.getDistance(), h2.getDistance());
-                    }
-                });
-
-
-                hospitalsByDistance = hospitalsWithDistances;
-                showRouteToNearestHospital();
-
-            }
-
-            @Override
-            public void onDistancesCalculationFailed() {
-
-                Log.d("Hospital", " FAILED " + " - Distance: " + " FAILED");
-            }
+                    Collections.sort(hospitalsWithDistances, new Comparator<Hospital>() {
+                        @Override
+                        public int compare(Hospital h1, Hospital h2) {
+                            return Double.compare(h1.getDistance(), h2.getDistance());
+                        }
+                    });
 
 
-        });
+                    hospitalsByDistance = hospitalsWithDistances;
+                    showRouteToNearestHospital();
+
+                }
+
+                @Override
+                public void onDistancesCalculationFailed() {
+
+                    Log.d("Hospital", " FAILED " + " - Distance: " + " FAILED");
+                }
+
+
+            });
+        }
     }
 
 
@@ -432,5 +456,39 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         outState.putParcelable("userLocation", currentLocation);
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
+    @Override
+    public void onInternetConnectivityChanged(boolean isConnected) {
+        if (isConnected) {
+            showOverlay(false);
+        } else {
+            showOverlay(true);
+        }
+    }
+
+    private void showOverlay(boolean show) {
+        if (show) {
+            overlayLayout.setVisibility(View.VISIBLE);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        } else {
+            overlayLayout.setVisibility(View.GONE);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Stop the InternetConnectivityChecker
+        connectivityChecker.stop();
+    }
 
 }
