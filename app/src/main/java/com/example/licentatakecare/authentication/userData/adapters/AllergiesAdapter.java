@@ -1,4 +1,4 @@
-package com.example.licentatakecare.authentication.userData.Adapters;
+package com.example.licentatakecare.authentication.userData.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;

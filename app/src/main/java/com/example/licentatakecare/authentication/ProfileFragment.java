@@ -21,8 +21,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.licentatakecare.authentication.model.LogEntry;
-import com.example.licentatakecare.authentication.userData.Adapters.AllergiesAdapter;
-import com.example.licentatakecare.authentication.userData.Adapters.LogAdapter;
+import com.example.licentatakecare.authentication.userData.adapters.AllergiesAdapter;
+import com.example.licentatakecare.authentication.userData.adapters.LogAdapter;
 import com.example.licentatakecare.authentication.model.Allergy;
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.map.MapsActivity;

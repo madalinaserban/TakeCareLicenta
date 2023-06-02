@@ -1,4 +1,4 @@
-package com.example.licentatakecare.authentication.userData.Adapters;
+package com.example.licentatakecare.authentication.userData.adapters;
 
 import android.content.Context;
 import android.graphics.Color;

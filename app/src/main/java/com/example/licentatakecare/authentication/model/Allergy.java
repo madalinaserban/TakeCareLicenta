@@ -1,6 +1,6 @@
 package com.example.licentatakecare.authentication.model;
 
-import com.example.licentatakecare.authentication.userData.Helper.AllergyType;
+import com.example.licentatakecare.authentication.userData.helper.AllergyType;
 
 import java.util.Locale;
 
