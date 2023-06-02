@@ -1,4 +1,4 @@
-package com.example.licentatakecare.Authentication.userData.Adapters;
+package com.example.licentatakecare.authentication.userData.Adapters;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.licentatakecare.Authentication.userData.Allergy;
+import com.example.licentatakecare.authentication.model.Allergy;
 import com.example.licentatakecare.R;
 
 class AllergyViewHolder extends RecyclerView.ViewHolder {

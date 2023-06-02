@@ -1,6 +1,4 @@
-package com.example.licentatakecare.Authentication;
-
-import static androidx.fragment.app.FragmentManager.TAG;
+package com.example.licentatakecare.authentication;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,13 +20,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.licentatakecare.Authentication.userData.Adapters.AllergiesAdapter;
-import com.example.licentatakecare.Authentication.userData.Adapters.LogAdapter;
-import com.example.licentatakecare.Authentication.userData.Allergy;
+import com.example.licentatakecare.authentication.model.LogEntry;
+import com.example.licentatakecare.authentication.userData.Adapters.AllergiesAdapter;
+import com.example.licentatakecare.authentication.userData.Adapters.LogAdapter;
+import com.example.licentatakecare.authentication.model.Allergy;
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.map.MapsActivity;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -37,7 +37,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -64,6 +64,8 @@ public class ProfileFragment extends Fragment {
     private TextView tv_userGender;
     private RecyclerView rv_allergiesRecyclerView;
     private RecyclerView rv_logRecyclerView;
+    private LogAdapter logAdapter;
+    private List<LogEntry> logList;
     private LinearLayout toolbarButtonsLayout;
 
     public ProfileFragment() {
@@ -140,6 +142,11 @@ public class ProfileFragment extends Fragment {
         tv_userAge = view.findViewById(R.id.profile_age);
         rv_allergiesRecyclerView = view.findViewById(R.id.allergiesRecyclerView);
         rv_logRecyclerView = view.findViewById(R.id.logRecyclerView);
+        logList = new ArrayList<>();
+        logAdapter = new LogAdapter(logList, rv_logRecyclerView);
+
+        rv_logRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        rv_logRecyclerView.setAdapter(logAdapter);
 
         // Retrieve the Bundle from arguments
         Bundle args = getArguments();
@@ -215,72 +222,83 @@ public class ProfileFragment extends Fragment {
     }
 
     void queryRealtime() {
-        // Set an empty adapter to the RecyclerView
-        LogAdapter logAdapter = new LogAdapter(new ArrayList<>());
-        rv_logRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        rv_logRecyclerView.setAdapter(logAdapter);
-
         DatabaseReference userCardRef = FirebaseDatabase.getInstance().getReference().child("UserCard");
         Query query = userCardRef.orderByChild("id").equalTo(userId);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        query.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                        DataSnapshot logSnapshot = userSnapshot.child("log");
-                        if (logSnapshot.exists()) {
-                            List<LogEntry> logList = new ArrayList<>();
-                            for (DataSnapshot entrySnapshot : logSnapshot.getChildren()) {
-                                String logId = entrySnapshot.getKey();
-                                String entryTimestamp = entrySnapshot.child("entry_timestamp").getValue(String.class);
-                                String exitTimestamp = entrySnapshot.child("exit_timestamp").getValue(String.class);
-                                String section = entrySnapshot.child("section").getValue(String.class);
-                                String hospital = entrySnapshot.child("hospital").getValue(String.class);
-                                LocalDateTime entryDateTime = LocalDateTime.parse(entryTimestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                                LocalDateTime exitDateTime = LocalDateTime.parse(exitTimestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
+                updateLogList(dataSnapshot);
+            }
 
-                                long durationInMillis = ChronoUnit.MILLIS.between(entryDateTime, exitDateTime);
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
+                updateLogList(dataSnapshot);
+            }
 
-                                long days = durationInMillis / (1000 * 60 * 60 * 24);
-                                long hours = (durationInMillis / (1000 * 60 * 60)) % 24;
-                                long minutes = (durationInMillis / (1000 * 60)) % 60;
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                // Handle child removed event if needed
+            }
 
-                                String timeDifference;
-                                if (days > 0) {
-                                    timeDifference = String.format(Locale.getDefault(), "%d day(s) %d hours %2 minutes", days, hours, minutes);
-                                } else {
-                                    if (hours > 1) {
-                                        if (minutes >= 1) {
-                                            timeDifference = String.format(Locale.getDefault(), "%d hours %d minute(s)", hours, minutes);
-                                        } else {
-                                            timeDifference = String.format(Locale.getDefault(), "%d hours", hours);
-                                        }
-                                    } else {
-                                        timeDifference = String.format(Locale.getDefault(), "%d hour %d minutes", hours, minutes);
-                                    }
-                                }
-
-                                String time = timeDifference;
-
-
-                                LogEntry logEntry = new LogEntry(entryTimestamp, exitTimestamp, section, hospital, time);
-                                logList.add(logEntry);
-                            }
-
-                            // Update the adapter with the new log data
-                            logAdapter.setLogList(logList);
-                            logAdapter.notifyDataSetChanged();
-                        }
-                    }
-                }
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
+                // Handle child moved event if needed
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("TAG", "Error retrieving user data: " + databaseError.getMessage());
+                // Handle the error
+                Log.e("ProfileFragment", "Error retrieving log data: " + databaseError.getMessage());
             }
         });
     }
+
+    private void updateLogList(DataSnapshot dataSnapshot) {
+        DataSnapshot logSnapshot = dataSnapshot.child("log");
+        if (logSnapshot.exists()) {
+            List<LogEntry> updatedList = new ArrayList<>();
+
+            for (DataSnapshot entrySnapshot : logSnapshot.getChildren()) {
+                // Retrieve log entry data
+                String entryTimestamp = entrySnapshot.child("entry_timestamp").getValue(String.class);
+                String exitTimestamp = entrySnapshot.child("exit_timestamp").getValue(String.class);
+                String section = entrySnapshot.child("section").getValue(String.class);
+                String hospital = entrySnapshot.child("hospital").getValue(String.class);
+                LocalDateTime entryDateTime = LocalDateTime.parse(entryTimestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                LocalDateTime exitDateTime = LocalDateTime.parse(exitTimestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+                long durationInMillis = ChronoUnit.MILLIS.between(entryDateTime, exitDateTime);
+
+                long days = durationInMillis / (1000 * 60 * 60 * 24);
+                long hours = (durationInMillis / (1000 * 60 * 60)) % 24;
+                long minutes = (durationInMillis / (1000 * 60)) % 60;
+
+                String timeDifference;
+                if (days > 0) {
+                    timeDifference = String.format(Locale.getDefault(), "%d day(s) %d hours %2 minutes", days, hours, minutes);
+                } else {
+                    if (hours > 1) {
+                        if (minutes >= 1) {
+                            timeDifference = String.format(Locale.getDefault(), "%d hours %d minute(s)", hours, minutes);
+                        } else {
+                            timeDifference = String.format(Locale.getDefault(), "%d hours", hours);
+                        }
+                    } else {
+                        timeDifference = String.format(Locale.getDefault(), "%d hour %d minutes", hours, minutes);
+                    }
+                }
+
+                // Create LogEntry object
+                LogEntry logEntry = new LogEntry(entryTimestamp, exitTimestamp, section, hospital, timeDifference);
+                updatedList.add(0, logEntry); // Add the entry at the beginning of the list
+            }
+            logList.clear(); // Clear the existing list
+            logList.addAll(0, updatedList);
+            logAdapter.notifyDataSetChanged(); // Notify the adapter of the data change
+        }
+    }
+
 
     public String ageCalculator(String birthdate) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());

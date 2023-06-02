@@ -1,4 +1,4 @@
-package com.example.licentatakecare.Authentication.userData.Helper;
+package com.example.licentatakecare.authentication.userData.Helper;
 
 public enum AllergyType {
     MEDICINE,

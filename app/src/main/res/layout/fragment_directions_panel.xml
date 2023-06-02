@@ -6,6 +6,13 @@
     android:elevation="8dp"
     android:padding="16dp">
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+
     <ImageView
         android:id="@+id/hospital_image"
         android:layout_width="110dp"

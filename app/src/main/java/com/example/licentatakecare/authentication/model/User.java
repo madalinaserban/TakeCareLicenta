@@ -1,4 +1,4 @@
-package com.example.licentatakecare.Authentication.userData;
+package com.example.licentatakecare.authentication.model;
 
 public class User {
     String first_name;

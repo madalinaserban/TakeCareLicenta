@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +43,10 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
     private String s_hospitalGoogleId;
     private String s_hospitalDistance;
     private String s_hospitalTime;
+    private TextView tvTimeToGetThere;
+    private TextView tvDistance;
     public static Hospital mHospital;
+    private ProgressBar prograssBar;
 
     private HospitalDetailsGenerator hospitalDetailsGenerator;
 
@@ -55,7 +59,7 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
         Bundle args = new Bundle();
         args.putString("hospitalGoogleId", hospital.getGoogle_id());
         args.putString("hospitalTime", hospital.getTimeToGetThere());
-        args.putString("hospitalDistance", String.valueOf(hospital.getDistance()/ 1000.0));
+        args.putString("hospitalDistance", String.valueOf(hospital.getDistance() / 1000.0));
         mHospital = hospital;
         fragment.setArguments(args);
         return fragment;
@@ -75,6 +79,9 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
         hospitalNumber = view.findViewById(R.id.hospital_phone);
         hospitalAdress = view.findViewById(R.id.address_value);
         hospitalDistance = view.findViewById(R.id.distance_value);
+        tvTimeToGetThere=view.findViewById(R.id.hospital_time_to_get_there);
+        tvDistance=view.findViewById(R.id.hospital_distance);
+        prograssBar = view.findViewById(R.id.progress_bar);
 
         // hospitalDirections = view.findViewById(R.id.hospital_directions);
 
@@ -106,7 +113,7 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
                 }
             }
         });
-
+        showLoadingScreen();
         return view;
     }
 
@@ -121,7 +128,7 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
         hospitalName.setText(name);
         hospitalRating.setRating((float) rating);
         hospitalTimeToGetThere.setText(s_hospitalTime);
-        hospitalDistance.setText(s_hospitalDistance+" km");
+        hospitalDistance.setText(s_hospitalDistance + " km");
         hospitalAdress.setText(address);
         hospitalNumber.setText(phone);
 
@@ -138,16 +145,55 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                         Log.d("Glide", "Image loaded successfully");
+                        // Hide the loading screen and show the content views
+                        hideLoadingScreen();
+                        showContentViews();
                         return false;
                     }
                 })
                 .into(hospitalImage);
-
-
     }
 
     @Override
     public void onError(String errorMessage) {
+        // Hide the loading screen
+        hideLoadingScreen();
 
+        // Show an error message (e.g., using Toast)
+        Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
     }
+
+    private void hideLoadingScreen() {
+        prograssBar.setVisibility(View.GONE);
+    }
+
+    private void showContentViews() {
+        hospitalImage.setVisibility(View.VISIBLE);
+        hospitalName.setVisibility(View.VISIBLE);
+        hospitalRating.setVisibility(View.VISIBLE);
+        hospitalOpeningHours.setVisibility(View.VISIBLE);
+        hospitalTimeToGetThere.setVisibility(View.VISIBLE);
+        hospitalNumber.setVisibility(View.VISIBLE);
+        hospitalAdress.setVisibility(View.VISIBLE);
+        tvDistance.setVisibility(View.VISIBLE);
+        tvTimeToGetThere.setVisibility(View.VISIBLE);
+        hospitalDistance.setVisibility(View.VISIBLE);
+    }
+
+    private void showLoadingScreen() {
+        // Hide the content views
+        hospitalImage.setVisibility(View.GONE);
+        hospitalName.setVisibility(View.GONE);
+        hospitalRating.setVisibility(View.GONE);
+        hospitalOpeningHours.setVisibility(View.GONE);
+        hospitalTimeToGetThere.setVisibility(View.GONE);
+        hospitalNumber.setVisibility(View.GONE);
+        hospitalAdress.setVisibility(View.GONE);
+        hospitalDistance.setVisibility(View.GONE);
+        tvDistance.setVisibility(View.GONE);
+        tvTimeToGetThere.setVisibility(View.GONE);
+
+        prograssBar.setVisibility(View.VISIBLE);
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.example.licentatakecare.Authentication;
+package com.example.licentatakecare.authentication.model;
 
 import com.google.firebase.database.PropertyName;
 
@@ -59,6 +59,17 @@ public class LogEntry {
 
     public void setHospital(String hospital) {
         this.hospital = hospital;
+    }
+    private boolean highlighted;
+
+    // Constructor and other methods
+
+    public boolean isHighlighted() {
+        return highlighted;
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
     }
 }
 

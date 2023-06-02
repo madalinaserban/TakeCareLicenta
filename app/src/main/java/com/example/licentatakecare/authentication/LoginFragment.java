@@ -1,8 +1,6 @@
-package com.example.licentatakecare.Authentication;
+package com.example.licentatakecare.authentication;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;

@@ -6,14 +6,14 @@
     android:paddingTop="8dp">
 
     <LinearLayout
+        android:id="@+id/linear_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_background"
         android:orientation="vertical"
         android:padding="10dp">
 
         <TextView
-            android:id="@+id/hospital"
+            android:id="@+id/tv_log_hospital"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -22,7 +22,7 @@
             android:textSize="13dp"/>
 
         <TextView
-            android:id="@+id/section"
+            android:id="@+id/tv_log_section"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:textAppearanceMedium" />

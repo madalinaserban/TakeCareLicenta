@@ -86,7 +86,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private BottomNavigationView bottomNavigationView;
     private InternetConnectivityChecker connectivityChecker;
     private Hospital closestHospital;
-    private ErrorFragment errorFragment;
+    private boolean needToReload=false;
     List<Hospital> hospitalsByDistance = new ArrayList<>();
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
@@ -467,10 +467,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onInternetConnectivityChanged(boolean isConnected) {
         if (isConnected) {
             showOverlay(false);
+            if(needToReload==true)
+            {
+                needToReload=false;
+                reloadMapsActivity();
+            }
         } else {
             showOverlay(true);
+            needToReload=true;
         }
     }
+    public void reloadMapsActivity() {
+        Intent intent = getIntent();
+        finish(); // Finish the current activity
+        startActivity(intent); // Start a new instance of MapsActivity
+    }
+
 
     private void showOverlay(boolean show) {
         if (show) {

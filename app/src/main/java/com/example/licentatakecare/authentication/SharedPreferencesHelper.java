@@ -1,4 +1,4 @@
-package com.example.licentatakecare.Authentication;
+package com.example.licentatakecare.authentication;
 
 import android.content.Context;
 import android.content.SharedPreferences;

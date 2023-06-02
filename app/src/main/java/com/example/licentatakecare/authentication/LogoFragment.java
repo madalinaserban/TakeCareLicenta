@@ -1,4 +1,4 @@
-package com.example.licentatakecare.Authentication;
+package com.example.licentatakecare.authentication;
 
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
@@ -8,7 +8,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.databinding.FragmentLogoBinding;
 
