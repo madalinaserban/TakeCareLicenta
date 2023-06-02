@@ -273,20 +273,20 @@ public class ProfileFragment extends Fragment {
                 long days = durationInMillis / (1000 * 60 * 60 * 24);
                 long hours = (durationInMillis / (1000 * 60 * 60)) % 24;
                 long minutes = (durationInMillis / (1000 * 60)) % 60;
+                long weeks = days / 7;
+                long months = days / 30;
 
                 String timeDifference;
-                if (days > 0) {
-                    timeDifference = String.format(Locale.getDefault(), "%d day(s) %d hours %2 minutes", days, hours, minutes);
+                if (months > 0) {
+                    timeDifference = String.format(Locale.getDefault(), "%d month(s) %d week(s) %d day(s) %d hour(s) %d minute(s)", months, weeks, days, hours, minutes);
+                } else if (weeks > 0) {
+                    timeDifference = String.format(Locale.getDefault(), "%d week(s) %d day(s) %d hour(s) %d minute(s)", weeks, days, hours, minutes);
+                } else if (days > 0) {
+                    timeDifference = String.format(Locale.getDefault(), "%d day(s) %d hour(s) %d minute(s)", days, hours, minutes);
+                } else if (hours > 0) {
+                    timeDifference = String.format(Locale.getDefault(), "%d hour(s) %d minute(s)", hours, minutes);
                 } else {
-                    if (hours > 1) {
-                        if (minutes >= 1) {
-                            timeDifference = String.format(Locale.getDefault(), "%d hours %d minute(s)", hours, minutes);
-                        } else {
-                            timeDifference = String.format(Locale.getDefault(), "%d hours", hours);
-                        }
-                    } else {
-                        timeDifference = String.format(Locale.getDefault(), "%d hour %d minutes", hours, minutes);
-                    }
+                    timeDifference = String.format(Locale.getDefault(), "%d minute(s)", minutes);
                 }
 
                 // Create LogEntry object
