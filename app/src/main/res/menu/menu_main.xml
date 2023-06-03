@@ -2,13 +2,9 @@
     <item
         android:id="@+id/directions_button"
         android:icon="@drawable/logo_light"
-        android:title="Directions" />
+        android:title="Find closest Hospital" />
     <item
         android:id="@+id/profile_button"
         android:icon="@drawable/logo_light"
         android:title="Profile" />
-    <item
-        android:id="@+id/hospitals_button"
-        android:icon="@drawable/logo_light"
-        android:title="Hospitals" />
 </menu>

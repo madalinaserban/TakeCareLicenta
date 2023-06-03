@@ -8,6 +8,11 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -38,6 +44,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -67,10 +74,7 @@ public class ProfileFragment extends Fragment {
     private LogAdapter logAdapter;
     private List<LogEntry> logList;
     private LinearLayout toolbarButtonsLayout;
-
-    public ProfileFragment() {
-        // Required empty public constructor
-    }
+    private ImageButton fullLogListButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -114,8 +118,7 @@ public class ProfileFragment extends Fragment {
                 getActivity().finish();
             }
         });
-
-        Button backToMapButton = view.findViewById(R.id.backToMapButton);
+        ImageButton backToMapButton = view.findViewById(R.id.backToMapButton);
         backToMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,6 +126,13 @@ public class ProfileFragment extends Fragment {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 getActivity().finish();
+            }
+        });
+        fullLogListButton = view.findViewById(R.id.fullLogListButton);
+        fullLogListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                animateToFullScreenFragment();
             }
         });
 
@@ -182,7 +192,6 @@ public class ProfileFragment extends Fragment {
                     tv_userAge.setText(age);
                     tv_userGender.setText(gender);
 
-
                     List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
                     for (DocumentReference reference : allergyReferences) {
                         tasks.add(reference.get());
@@ -238,12 +247,11 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                // Handle child removed event if needed
+
             }
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
-                // Handle child moved event if needed
             }
 
             @Override
@@ -301,7 +309,7 @@ public class ProfileFragment extends Fragment {
 
 
     public String ageCalculator(String birthdate) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
         try {
             // Parse the birthdate string into a Date object
@@ -336,4 +344,21 @@ public class ProfileFragment extends Fragment {
             toolbarButtonsLayout.setVisibility(View.VISIBLE);
         }
     }
+
+    private void animateToFullScreenFragment() {
+        // Create the full screen fragment
+        LogFullScreenFragment fullScreenFragment = new LogFullScreenFragment(logList);
+
+        // Pass the log list to the full screen fragment
+        Bundle args = new Bundle();
+        args.putSerializable("logList", (Serializable) logList);
+        fullScreenFragment.setArguments(args);
+
+        // Navigate to the full screen fragment using the NavController
+        NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentContainerView);
+        navController.navigate(R.id.action_profileFragment_to_logFullScreenFragment, args);
+    }
+
+
+
 }

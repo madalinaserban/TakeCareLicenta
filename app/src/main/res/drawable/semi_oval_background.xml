@@ -1,7 +1,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/nude" /> <!-- Replace with your desired pastel color -->
+    <solid android:color="#bdd7ff" />
     <corners android:topLeftRadius="0dp"
         android:topRightRadius="0dp"
-        android:bottomLeftRadius="50dp"
-        android:bottomRightRadius="50dp" />
+        android:bottomLeftRadius="150dp"
+        android:bottomRightRadius="150dp" />
 </shape>

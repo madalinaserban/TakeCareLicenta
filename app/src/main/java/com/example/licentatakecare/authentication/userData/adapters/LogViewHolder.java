@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.licentatakecare.authentication.model.LogEntry;
@@ -34,24 +35,24 @@ public class LogViewHolder extends RecyclerView.ViewHolder {
         exitTimestampTextView = itemView.findViewById(R.id.exit_timestamp);
         sectionTextView = itemView.findViewById(R.id.tv_log_section);
         hospitalTextView = itemView.findViewById(R.id.tv_log_hospital);
-        timeTextView = itemView.findViewById(R.id.tv_time);
+        timeTextView = itemView.findViewById(R.id.stayed_for_duration);
         linear_background = itemView.findViewById(R.id.linear_background);
         mContext = context;
     }
 
     public void bind(LogEntry logEntry) {
-        entryTimestampTextView.setText("Entry: " + logEntry.getEntryTimestamp());
-        exitTimestampTextView.setText("Exit: " + logEntry.getExitTimestamp());
-        sectionTextView.setText("Section: " + logEntry.getSection());
+        entryTimestampTextView.setText(logEntry.getEntryTimestamp());
+        exitTimestampTextView.setText(logEntry.getExitTimestamp());
+        sectionTextView.setText(logEntry.getSection());
         hospitalTextView.setText(logEntry.getHospital());
-        timeTextView.setText("Stayed for: " + logEntry.getTimeDifference());
+        timeTextView.setText(logEntry.getTimeDifference());
         ESection section = ESection.valueOf(logEntry.getSection().toUpperCase(Locale.ROOT));
         int backgroundColor = getBackgroundColorForSection(section);
 
         // Create a ShapeDrawable with rounded corners
         GradientDrawable drawable = new GradientDrawable();
         drawable.setShape(GradientDrawable.RECTANGLE);
-        drawable.setCornerRadii(new float[]{50, 50, 50, 50, 50, 50, 50, 50});
+        drawable.setCornerRadii(new float[]{90, 90, 90, 90, 90, 90, 90, 90});
         drawable.setColor(backgroundColor);
 
         // Set the ShapeDrawable as the background of the LinearLayout
@@ -83,6 +84,7 @@ public class LogViewHolder extends RecyclerView.ViewHolder {
                 color = ContextCompat.getColor(mContext, R.color.btn_all);
                 break;
         }
-        return color;
+        int transparentcolor = ColorUtils.setAlphaComponent(color, 178);
+        return transparentcolor;
     }
 }

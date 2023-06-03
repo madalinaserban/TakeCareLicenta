@@ -1,7 +1,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/fragment_container"
     android:orientation="vertical">
+
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -12,17 +14,36 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/white"
             android:minHeight="?attr/actionBarSize"
-            android:titleTextColor="@android:color/white"
-            >
+            android:titleTextColor="@android:color/white">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:text="Profile"
+                android:textColor="@color/black" />
+
+            <ImageButton
+                android:id="@+id/backToMapButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/backarrow" />
+
 
             <ImageView
                 android:id="@+id/expandButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/logo_light"
-                android:layout_gravity="end"
-                android:padding="8dp"
-                android:contentDescription="Expand Icon" />
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="Expand Icon"
+                android:scaleType="fitCenter"
+                android:src="@drawable/expandmenu" />
 
         </com.google.android.material.appbar.MaterialToolbar>
 
@@ -39,20 +60,12 @@
                 android:layout_height="wrap_content"
                 android:text="Sign Out"
                 android:textColor="@android:color/white" />
-
-            <Button
-                android:id="@+id/backToMapButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Back to Map"
-                android:textColor="@android:color/white"
-                android:layout_marginStart="16dp" />
-
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="156dp">
 
         <View
             android:id="@+id/oval_background"
@@ -66,11 +79,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="20dp"
             android:text="Name"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/profile_date_of_birth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/profile_card_id"
+            android:layout_centerHorizontal="true"
+            android:padding="10dp"
+            android:text="Date of Birth: 15th May 1985"
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/profile_card_id"
@@ -83,22 +106,13 @@
             android:textColor="@color/black" />
 
         <TextView
-            android:id="@+id/profile_date_of_birth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/profile_gender"
-            android:layout_centerHorizontal="true"
-            android:text="Date of Birth: 15th May 1985"
-            android:textColor="@color/black" />
-
-        <TextView
             android:id="@+id/profile_gender"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/profile_card_id"
+            android:layout_below="@id/profile_date_of_birth"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="-15dp"
-            android:padding="15dp"
+            android:padding="10dp"
             android:text="Gender: Male"
             android:textColor="@color/black" />
 
@@ -119,8 +133,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
                 android:background="@drawable/rounded_background"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
@@ -129,7 +144,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_marginTop="10dp"
-                    android:src="@drawable/bloodtype" />
+                    android:src="@drawable/blood" />
 
                 <TextView
                     android:id="@+id/profile_blood_type"
@@ -154,8 +169,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
                 android:background="@drawable/rounded_background"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
@@ -185,6 +201,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:padding="16dp"
         android:text="Allergies:" />
 
@@ -194,16 +211,33 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" />
 
-    <TextView
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="Your visits:" />
+        android:orientation="horizontal">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/logRecyclerView"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"/>
+            android:gravity="start|center_vertical"
+            android:padding="16dp"
+            android:text="Your visits:" />
+
+        <ImageButton
+            android:id="@+id/fullLogListButton"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="230dp"
+            android:backgroundTint="@color/white"
+            android:scaleType="fitCenter"
+            android:gravity="end|center_vertical"
+            android:src="@drawable/fullscreen" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/logRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
 
 </LinearLayout>
