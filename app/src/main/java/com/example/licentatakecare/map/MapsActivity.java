@@ -3,6 +3,9 @@ package com.example.licentatakecare.map;
 import static com.example.licentatakecare.map.util.clusters.ESection.ALL;
 import static com.example.licentatakecare.map.util.clusters.ESection.CARDIOLOGY;
 import static com.example.licentatakecare.map.util.clusters.ESection.EMERGENCY;
+import static com.example.licentatakecare.map.util.clusters.ESection.LABORATORY;
+import static com.example.licentatakecare.map.util.clusters.ESection.PEDIATRICS;
+import static com.example.licentatakecare.map.util.clusters.ESection.PULMONARY;
 import static com.example.licentatakecare.map.util.clusters.ESection.RADIOLOGY;
 
 import androidx.annotation.NonNull;
@@ -86,7 +89,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private BottomNavigationView bottomNavigationView;
     private InternetConnectivityChecker connectivityChecker;
     private Hospital closestHospital;
-    private boolean needToReload=false;
+    private boolean needToReload = false;
     List<Hospital> hospitalsByDistance = new ArrayList<>();
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
@@ -298,6 +301,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mSection = EMERGENCY;
                 Log.d("RadioGroup", mSection.toString());
                 break;
+            case R.id.button_pediatrics:
+                mSection = PEDIATRICS;
+                break;
+            case R.id.button_laboratory:
+                mSection = LABORATORY;
+                break;
+            case R.id.button_pulmonary:
+                mSection = PULMONARY;
+                break;
             case R.id.button_all:
                 mSection = ALL;
                 Log.d("RadioGroup", mSection.toString());
@@ -467,16 +479,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onInternetConnectivityChanged(boolean isConnected) {
         if (isConnected) {
             showOverlay(false);
-            if(needToReload==true)
-            {
-                needToReload=false;
+            if (needToReload == true) {
+                needToReload = false;
                 reloadMapsActivity();
             }
         } else {
             showOverlay(true);
-            needToReload=true;
+            needToReload = true;
         }
     }
+
     public void reloadMapsActivity() {
         Intent intent = getIntent();
         finish(); // Finish the current activity

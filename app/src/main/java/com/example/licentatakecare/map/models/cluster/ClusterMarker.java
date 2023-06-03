@@ -13,6 +13,15 @@ public class ClusterMarker implements ClusterItem {
     private Hospital mHospital;
     private int mColor;
     private Marker marker;
+    private boolean isCurrentUserLocation;
+
+    public boolean getCurrentUserLocation() {
+        return isCurrentUserLocation;
+    }
+
+    public void setCurrentUserLocation(boolean currentLocationMarker) {
+        isCurrentUserLocation = currentLocationMarker;
+    }
 
     public Hospital getHospital() {
         return mHospital;

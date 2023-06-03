@@ -4,6 +4,9 @@ public enum ESection {
     EMERGENCY,
     RADIOLOGY,
     CARDIOLOGY,
+    PEDIATRICS,
+    LABORATORY,
+    PULMONARY,
     ALL
 }
 

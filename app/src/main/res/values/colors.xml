@@ -21,6 +21,9 @@
     <color name="btn_radiology">#7FACD6</color>
     <color name="btn_emergency">#BFB8DA</color>
     <color name="btn_cardiology">#E8B7D4</color>
+    <color name="btn_pediatrics">#FFD87F</color>
+    <color name="btn_pulmonary">#C1D8E6</color>
+    <color name="btn_laboratory">#A4D6B7</color>
     <color name="nude">#acbed8</color>
     <color name="medicine">#97CADB</color>
     <color name="animal">#CDB3D4</color>

@@ -43,8 +43,7 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
     private GoogleMap mMap;
     private MapsActivity mActivity;
 
-    public HospitalClusterRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager,MapsActivity activity)
-    {
+    public HospitalClusterRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager, MapsActivity activity) {
         super(context, map, clusterManager);
         mContext = context;
         currentZoomLevel = (int) map.getCameraPosition().zoom;
@@ -146,6 +145,15 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
             case CARDIOLOGY:
                 color = ContextCompat.getColor(mContext, R.color.btn_cardiology);
                 break;
+            case PEDIATRICS:
+                color = ContextCompat.getColor(mContext, R.color.btn_pediatrics);
+                break;
+            case PULMONARY:
+                color = ContextCompat.getColor(mContext, R.color.btn_pulmonary);
+                break;
+            case LABORATORY:
+                color = ContextCompat.getColor(mContext, R.color.btn_laboratory);
+                break;
             case ALL:
                 color = ContextCompat.getColor(mContext, R.color.btn_all);
                 break;
@@ -158,13 +166,18 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
     public boolean onMarkerClick(@NonNull Marker marker) {
         ClusterMarker clusterMarker = (ClusterMarker) marker.getTag();
         marker.setZIndex(2f);
-       Hospital hospital = clusterMarker.getHospital();
-        mActivity.showDirectionsPanel(hospital);
-        mActivity.showRouteChosenHospital(hospital);
+        if (clusterMarker != null) {
+
+            Hospital hospital = clusterMarker.getHospital();
+
+            mActivity.showDirectionsPanel(hospital);
+            mActivity.showRouteChosenHospital(hospital);
+        }
 
 
         return false;
     }
+
     private BitmapDescriptor getSmallMarkerIcon(int color) {
         // Define the desired width and height for the marker icon
         int width = 5;

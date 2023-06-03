@@ -70,6 +70,15 @@ public class LogViewHolder extends RecyclerView.ViewHolder {
             case CARDIOLOGY:
                 color = ContextCompat.getColor(mContext, R.color.btn_cardiology);
                 break;
+            case PEDIATRICS:
+                color = ContextCompat.getColor(mContext, R.color.btn_pediatrics);
+                break;
+            case PULMONARY:
+                color = ContextCompat.getColor(mContext, R.color.btn_pulmonary);
+                break;
+            case LABORATORY:
+                color = ContextCompat.getColor(mContext, R.color.btn_laboratory);
+                break;
             case ALL:
                 color = ContextCompat.getColor(mContext, R.color.btn_all);
                 break;

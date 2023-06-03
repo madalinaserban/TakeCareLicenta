@@ -60,6 +60,30 @@
                 android:background="@drawable/round_button"
                 android:text="Cardiology"
                 app:backgroundTint="#E8B7D4" />
+            <RadioButton
+                android:id="@+id/button_pediatrics"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/round_button"
+                android:text="Pediatrics"
+                app:backgroundTint="#FFD87F" />
+            <RadioButton
+                android:id="@+id/button_pulmonary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/round_button"
+                android:text="Pulmonary"
+                app:backgroundTint="#C1D8E6" />
+            <RadioButton
+                android:id="@+id/button_laboratory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/round_button"
+                android:text="Laboratory"
+                app:backgroundTint="#A4D6B7" />
         </RadioGroup>
     </HorizontalScrollView>
 
