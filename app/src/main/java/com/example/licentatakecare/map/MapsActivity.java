@@ -90,6 +90,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private InternetConnectivityChecker connectivityChecker;
     private Hospital closestHospital;
     private boolean needToReload = false;
+    private boolean locationPermission = false;
     List<Hospital> hospitalsByDistance = new ArrayList<>();
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
@@ -139,7 +140,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.directions_button:
-                        showDirectionsPanel(closestHospital);
+                        if(locationPermission == true)
+                        { showDirectionsPanel(closestHospital);}
+                        else{   ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+
+                        }
                         return true;
                     case R.id.profile_button:
                         Intent intent = new Intent(MapsActivity.this, MainActivity.class);
@@ -288,51 +293,47 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        switch (checkedId) {
-            case R.id.button_radiology:
-                mSection = RADIOLOGY;
-                Log.d("RadioGroup", mSection.toString());
-                break;
-            case R.id.button_cardiology:
-                mSection = CARDIOLOGY;
-                Log.d("RadioGroup", mSection.toString());
-                break;
-            case R.id.button_emergency:
-                mSection = EMERGENCY;
-                Log.d("RadioGroup", mSection.toString());
-                break;
-            case R.id.button_pediatrics:
-                mSection = PEDIATRICS;
-                break;
-            case R.id.button_laboratory:
-                mSection = LABORATORY;
-                break;
-            case R.id.button_pulmonary:
-                mSection = PULMONARY;
-                break;
-            case R.id.button_all:
-                mSection = ALL;
-                Log.d("RadioGroup", mSection.toString());
-                break;
-        }
-        if (isNetworkAvailable()) {
-            // Redraw the hospital routes
-            showRouteToNearestHospital();
-            mHospitalClusterRenderer.updateMarker(mSection, mClusterMarkers);
-        }
+        if(locationPermission == true) {
+            switch (checkedId) {
+                case R.id.button_radiology:
+                    mSection = RADIOLOGY;
+                    Log.d("RadioGroup", mSection.toString());
+                    break;
+                case R.id.button_cardiology:
+                    mSection = CARDIOLOGY;
+                    Log.d("RadioGroup", mSection.toString());
+                    break;
+                case R.id.button_emergency:
+                    mSection = EMERGENCY;
+                    Log.d("RadioGroup", mSection.toString());
+                    break;
+                case R.id.button_pediatrics:
+                    mSection = PEDIATRICS;
+                    break;
+                case R.id.button_laboratory:
+                    mSection = LABORATORY;
+                    break;
+                case R.id.button_pulmonary:
+                    mSection = PULMONARY;
+                    break;
+                case R.id.button_all:
+                    mSection = ALL;
+                    Log.d("RadioGroup", mSection.toString());
+                    break;
+            }
+            if (isNetworkAvailable()) {
+                // Redraw the hospital routes
+                showRouteToNearestHospital();
+                mHospitalClusterRenderer.updateMarker(mSection, mClusterMarkers);
+            }
 
-
+        }
     }
 
 
     public void getLocation() {
-        // Check if the app is already waiting for a permission
-        if (mWaitingForPermission) {
-            return;
-        }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            mWaitingForPermission = true;
             ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
         } else {
             // Check for internet connectivity
@@ -364,35 +365,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted, request for permission
             mGoogleMap.setMyLocationEnabled(true);
+            locationPermission = true;
+
+            LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("My Current Location");
+            // Add my location to the map
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+            googleMap.addMarker(markerOptions);
+            mClusterManager.cluster(); // cluster once at the end
+
+            // Assign the GoogleMap object to the member variable
+            mGoogleMap = googleMap;
         }
-
-        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("My Current Location");
-        // Add my location to the map
-        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-        googleMap.addMarker(markerOptions);
-        mClusterManager.cluster(); // cluster once at the end
-
-        // Assign the GoogleMap object to the member variable
-        mGoogleMap = googleMap;
 
     }
 
     public void addHospitalsToMap(List<Hospital> hospitals) {
-        for (Hospital hospital : hospitals) {
-            ClusterMarker marker = new ClusterMarker(hospital, hospital.getAvailability(ALL));
-            mClusterMarkers.add(marker);
-            Log.d("Cluster add", "" + marker.getTitle());
-            mClusterManager.addItem(marker);
-        }
-        mClusterManager.cluster(); // cluster once at the end
+            for (Hospital hospital : hospitals) {
+                ClusterMarker marker = new ClusterMarker(hospital, hospital.getAvailability(ALL));
+                mClusterMarkers.add(marker);
+                Log.d("Cluster add", "" + marker.getTitle());
+                mClusterManager.addItem(marker);
+            }
+            mClusterManager.cluster(); // cluster once at the end
     }
 
     public void onHospitalsRetrieved(List<Hospital> hospitals) {
-        if (isNetworkAvailable()) {
+        if (isNetworkAvailable() && locationPermission == true) {
             mHospitals = hospitals;
             addHospitalsToMap(mHospitals);
             latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
@@ -428,10 +429,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     public void onHospitalUpdated(Hospital hospital) {
-        for (ClusterMarker clusterMarker : mClusterMarkers) {
-            if (clusterMarker.getHospital().getId().equals(hospital.getId())) {
-                clusterMarker.setmNumAvailablePlaces(hospital.getAvailability(mSection));
-                mHospitalClusterRenderer.updateHospitalChanged(clusterMarker);
+        if (locationPermission == true) {
+            for (ClusterMarker clusterMarker : mClusterMarkers) {
+                if (clusterMarker.getHospital().getId().equals(hospital.getId())) {
+                    clusterMarker.setmNumAvailablePlaces(hospital.getAvailability(mSection));
+                    mHospitalClusterRenderer.updateHospitalChanged(clusterMarker);
+                }
             }
         }
     }
@@ -454,11 +457,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // Reset the flag
-        mWaitingForPermission = false;
-        if (requestCode == REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                getLocation();
+       if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        {  locationPermission = true;
+                reloadMapsActivity();
         }
     }
 

@@ -88,7 +88,7 @@ public class LoginFragment extends Fragment {
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
                             if (documentSnapshot.exists()) {
                                 String dateOfBirth = documentSnapshot.getString("birth_date");
-                                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                                 try {
                                     Date birthDate = dateFormat.parse(dateOfBirth);
                                     Calendar calendar = Calendar.getInstance();
