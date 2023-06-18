@@ -40,11 +40,11 @@ public class HospitalRouteGenerator {
                 "&destination=" + hlatLng.latitude + "," + hlatLng.longitude +
                 "&key=" + mContext.getResources().getString(R.string.google_maps_key);
 
+
         createDirectionsApi().getDirections(url).enqueue(new Callback<DirectionsResponse>() {
             @Override
             public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
                 if (!response.isSuccessful()) {
-                    // Handle non-successful response here
                     Log.e("", "Direction response not successful: " + response.code());
                     directionsCallback.onFailure();
                     return;
@@ -55,7 +55,6 @@ public class HospitalRouteGenerator {
 
                 DirectionsResponse directionsResponse = response.body();
                 if (directionsResponse == null) {
-                    // Handle null response here
                     Log.e("", "Direction response body is null");
                     directionsCallback.onFailure();
                     return;
@@ -63,7 +62,6 @@ public class HospitalRouteGenerator {
 
                 List<Route> routes = directionsResponse.getRoutes();
                 if (routes.isEmpty()) {
-                    // Handle empty routes here
                     Log.e("", "Direction response has no routes");
                     directionsCallback.onFailure();
                     return;

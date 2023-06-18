@@ -6,6 +6,7 @@ import java.util.List;
 public class Leg {
     public Distance distance;
     public Duration duration;
+    public List<Step> steps;
 
     public Distance getDistance() {
         return distance;
@@ -31,6 +32,6 @@ public class Leg {
         this.steps = steps;
     }
 
-    public List<Step> steps;
+
 }
 

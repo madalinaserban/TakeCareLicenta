@@ -145,7 +145,6 @@ public class DirectionsPanelFragment extends Fragment implements DetailsCallback
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                         Log.d("Glide", "Image loaded successfully");
-                        // Hide the loading screen and show the content views
                         hideLoadingScreen();
                         showContentViews();
                         return false;

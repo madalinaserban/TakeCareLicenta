@@ -34,7 +34,6 @@ public class HospitalDistanceCalculator {
     }
 
     public void calculateDistancesToHospitals(Location userLocation, List<Hospital> hospitals, final CalculateDistancesCallback callback) {
-        // Build the destinations string
         StringBuilder destinationsBuilder = new StringBuilder();
         for (Hospital hospital : hospitals) {
             destinationsBuilder.append(hospital.getGeoPoint().getLatitude())

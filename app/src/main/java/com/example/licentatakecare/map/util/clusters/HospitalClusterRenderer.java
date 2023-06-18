@@ -66,7 +66,6 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
     @Override
     protected void onClusterItemRendered(ClusterMarker clusterItem, Marker marker) {
         super.onClusterItemRendered(clusterItem, marker);
-        // Set the Marker as the marker property of the corresponding ClusterMarker
         clusterItem.setMarker(marker);
         marker.setTag(clusterItem);
         // If the number of available places is greater than 0, display it in a text overlay
@@ -121,10 +120,12 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
                 .useFont(Typeface.DEFAULT_BOLD)
                 .fontSize(50)
                 .bold()
+                .height(130)
+                .width(130)
                 .endConfig()
                 .buildRound(Integer.toString(clusterMarker.getNumAvailablePlaces()), getMarkerColor());
-        int width = drawable.getIntrinsicWidth() + 130;
-        int height = drawable.getIntrinsicHeight() + 130;
+        int width = drawable.getIntrinsicWidth();
+        int height = drawable.getIntrinsicHeight();
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -179,22 +180,14 @@ public class HospitalClusterRenderer extends DefaultClusterRenderer<ClusterMarke
     }
 
     private BitmapDescriptor getSmallMarkerIcon(int color) {
-        // Define the desired width and height for the marker icon
         int width = 5;
         int height = 5;
 
-        // Create a Bitmap object with the desired width and height
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-
-        // Create a Paint object to set the color of the marker
         Paint paint = new Paint();
         paint.setColor(color);
-
-        // Draw a circle on the canvas with the desired color and size
         canvas.drawCircle(width / 2, height / 2, width / 2, paint);
-
-        // Return a BitmapDescriptor created from the generated bitmap
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 

@@ -95,12 +95,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ActivityMapsBinding binding;
     private List<ClusterMarker> mClusterMarkers = new ArrayList<>();
     HospitalDistanceCalculator calculator = new HospitalDistanceCalculator();
-    // Declare a boolean to keep track of whether the app is waiting for a permission
     private boolean mWaitingForPermission = false;
     private List<Polyline> mRoutePolylines = new ArrayList<>();
-
-
-    // Declare a Bundle to save the state of the activity
     private Bundle mSavedInstanceState;
 
 
@@ -111,7 +107,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(binding.getRoot());
         connectivityChecker = new InternetConnectivityChecker(this, this);
         connectivityChecker.start();
-        // Show the error fragment initially
         RadioGroup radioGroup = findViewById(R.id.radio_group);
         mRouteGenerator = new HospitalRouteGenerator();
         btn_all = findViewById(R.id.button_all);
@@ -143,7 +138,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if(locationPermission == true)
                         { showDirectionsPanel(closestHospital);}
                         else{   ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
-
                         }
                         return true;
                     case R.id.profile_button:
@@ -177,7 +171,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void showRouteChosenHospital(Hospital hospital) {
-        // Clear existing hospital routes from the map
+
         for (Polyline polyline : mRoutePolylines) {
             if (polyline.getColor() == Color.BLUE)
                 polyline.remove();
@@ -186,16 +180,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mRouteGenerator.displayDirectionsToHospital(this, currentLocation, hospital, new DirectionsCallback() {
                 @Override
                 public void onSuccess(Route route) {
-                    // Loop through each leg of the route
+
                     for (Leg leg : route.getLegs()) {
-
-                        // Loop through each step of the leg
                         for (Step step : leg.getSteps()) {
-
-                            // Get the polyline of the step and decode it to a list of LatLng points
                             List<LatLng> points = PolyUtil.decode(String.valueOf(step.getPolyline().getPoints()));
-
-                            // Draw the polyline on the map
                             PolylineOptions polylineOptions = new PolylineOptions()
                                     .addAll(points)
                                     .color(Color.BLUE)
@@ -232,16 +220,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mRouteGenerator.displayDirectionsToHospital(this, currentLocation, closestHospital, new DirectionsCallback() {
                 @Override
                 public void onSuccess(Route route) {
-                    // Loop through each leg of the route
                     for (Leg leg : route.getLegs()) {
-
-                        // Loop through each step of the leg
                         for (Step step : leg.getSteps()) {
-
-                            // Get the polyline of the step and decode it to a list of LatLng points
                             List<LatLng> points = PolyUtil.decode(String.valueOf(step.getPolyline().getPoints()));
-
-                            // Draw the polyline on the map
                             PolylineOptions polylineOptions = new PolylineOptions()
                                     .addAll(points)
                                     .color(Color.RED)
@@ -322,7 +303,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     break;
             }
             if (isNetworkAvailable()) {
-                // Redraw the hospital routes
                 showRouteToNearestHospital();
                 mHospitalClusterRenderer.updateMarker(mSection, mClusterMarkers);
             }
@@ -386,10 +366,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             for (Hospital hospital : hospitals) {
                 ClusterMarker marker = new ClusterMarker(hospital, hospital.getAvailability(ALL));
                 mClusterMarkers.add(marker);
-                Log.d("Cluster add", "" + marker.getTitle());
                 mClusterManager.addItem(marker);
             }
-            mClusterManager.cluster(); // cluster once at the end
+            mClusterManager.cluster();
     }
 
     public void onHospitalsRetrieved(List<Hospital> hospitals) {
