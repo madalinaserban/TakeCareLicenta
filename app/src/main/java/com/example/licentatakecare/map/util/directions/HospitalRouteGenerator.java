@@ -7,7 +7,7 @@ import android.util.Log;
 import com.example.licentatakecare.R;
 import com.example.licentatakecare.map.models.directions.DirectionsApiInterface;
 import com.example.licentatakecare.map.models.directions.DirectionsResponse;
-import com.example.licentatakecare.map.models.directions.Route;
+import com.example.licentatakecare.map.models.directions.model.Route;
 import com.example.licentatakecare.map.models.hospital.Hospital;
 import com.example.licentatakecare.map.util.directions.callback.DirectionsCallback;
 import com.google.android.gms.maps.model.LatLng;

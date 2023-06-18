@@ -1,11 +1,12 @@
-package com.example.licentatakecare.map.models.directions;
+package com.example.licentatakecare.map.models.directions.model;
+
 
 import java.util.List;
 
-public class Route {
-    private Distance distance;
-    private Duration duration;
-    private List<Leg> legs;
+public class Leg {
+    public Distance distance;
+    public Duration duration;
+    public List<Step> steps;
 
     public Distance getDistance() {
         return distance;
@@ -23,12 +24,14 @@ public class Route {
         this.duration = duration;
     }
 
-    public List<Leg> getLegs() {
-        return legs;
+    public List<Step> getSteps() {
+        return steps;
     }
 
-    public void setLegs(List<Leg> legs) {
-        this.legs = legs;
+    public void setSteps(List<Step> steps) {
+        this.steps = steps;
     }
+
 
 }
+

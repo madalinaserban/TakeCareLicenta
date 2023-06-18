@@ -1,7 +1,7 @@
 package com.example.licentatakecare.map.util.timeAndDistance;
 
-import com.example.licentatakecare.map.models.directions.Distance;
-import com.example.licentatakecare.map.models.directions.Duration;
+import com.example.licentatakecare.map.models.directions.model.Distance;
+import com.example.licentatakecare.map.models.directions.model.Duration;
 import com.google.gson.annotations.SerializedName;
 
 public class DistanceMatrixElement {

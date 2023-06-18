@@ -1,5 +1,7 @@
 package com.example.licentatakecare.map.models.directions;
 
+import com.example.licentatakecare.map.models.directions.model.Route;
+
 import java.util.List;
 
 public class DirectionsResponse {

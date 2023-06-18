@@ -2,8 +2,8 @@ package com.example.licentatakecare.map.util.directions;
 
 import android.location.Location;
 
-import com.example.licentatakecare.map.models.directions.Distance;
-import com.example.licentatakecare.map.models.directions.Duration;
+import com.example.licentatakecare.map.models.directions.model.Distance;
+import com.example.licentatakecare.map.models.directions.model.Duration;
 import com.example.licentatakecare.map.models.hospital.Hospital;
 import com.example.licentatakecare.map.util.timeAndDistance.CalculateDistancesCallback;
 import com.example.licentatakecare.map.util.timeAndDistance.DistanceMatrixElement;

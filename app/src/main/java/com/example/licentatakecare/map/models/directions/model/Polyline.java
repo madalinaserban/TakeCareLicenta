@@ -1,4 +1,4 @@
-package com.example.licentatakecare.map.models.directions;
+package com.example.licentatakecare.map.models.directions.model;
 
 public class Polyline {
     public String points;

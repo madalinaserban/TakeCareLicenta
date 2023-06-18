@@ -1,8 +1,5 @@
 package com.example.licentatakecare.map.models.hospital;
 
-import android.location.Location;
-
-import com.example.licentatakecare.map.models.directions.Duration;
 import com.example.licentatakecare.map.util.clusters.ESection;
 import com.google.firebase.firestore.GeoPoint;
 

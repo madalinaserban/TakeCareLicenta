@@ -1,8 +1,6 @@
-package com.example.licentatakecare.map.models.directions;
+package com.example.licentatakecare.map.models.directions.model;
 
 import android.location.Location;
-
-import com.example.licentatakecare.map.models.directions.Polyline;
 
 
 public class Step {
