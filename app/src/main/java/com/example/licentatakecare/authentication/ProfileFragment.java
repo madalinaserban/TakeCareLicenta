@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -88,7 +89,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         toolbarButtonsLayout = view.findViewById(R.id.toolbarButtonsLayout);
@@ -354,11 +354,17 @@ public class ProfileFragment extends Fragment {
         args.putSerializable("logList", (Serializable) logList);
         fullScreenFragment.setArguments(args);
 
-        // Navigate to the full screen fragment using the NavController
         NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentContainerView);
-        navController.navigate(R.id.action_profileFragment_to_logFullScreenFragment, args);
+        navController.navigate(R.id.action_profileFragment_to_logFullScreenFragment, args,
+                new NavOptions.Builder().setPopUpTo(R.id.profileFragment, false).build());
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("userId", userId);
+        outState.putSerializable("logList", (Serializable) logList);
+    }
 
 
 }

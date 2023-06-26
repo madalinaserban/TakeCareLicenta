@@ -14,8 +14,6 @@ import com.example.licentatakecare.R;
 
 public class ErrorFragment extends Fragment {
 
-    private OnRetryClickListener retryClickListener;
-
     public static ErrorFragment newInstance() {
         return new ErrorFragment();
     }
@@ -30,22 +28,7 @@ public class ErrorFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-       // Button retryButton = view.findViewById(R.id.retryButton);
-//        retryButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (retryClickListener != null) {
-//                    retryClickListener.onRetryClick();
-//                }
-//            }
-//        });
+
     }
 
-    public void setOnRetryClickListener(OnRetryClickListener listener) {
-        this.retryClickListener = listener;
-    }
-
-    public interface OnRetryClickListener {
-        void onRetryClick();
-    }
 }

@@ -49,7 +49,6 @@ public class LogViewHolder extends RecyclerView.ViewHolder {
         ESection section = ESection.valueOf(logEntry.getSection().toUpperCase(Locale.ROOT));
         int backgroundColor = getBackgroundColorForSection(section);
 
-        // Create a ShapeDrawable with rounded corners
         GradientDrawable drawable = new GradientDrawable();
         drawable.setShape(GradientDrawable.RECTANGLE);
         drawable.setCornerRadii(new float[]{90, 90, 90, 90, 90, 90, 90, 90});
@@ -79,9 +78,6 @@ public class LogViewHolder extends RecyclerView.ViewHolder {
                 break;
             case LABORATORY:
                 color = ContextCompat.getColor(mContext, R.color.btn_laboratory);
-                break;
-            case ALL:
-                color = ContextCompat.getColor(mContext, R.color.btn_all);
                 break;
         }
         int transparentcolor = ColorUtils.setAlphaComponent(color, 178);

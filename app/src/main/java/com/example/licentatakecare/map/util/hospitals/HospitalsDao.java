@@ -78,7 +78,6 @@ public class HospitalsDao {
                                 }
                                 hospital.setSections(sections);
                                 callback.onHospitalUpdated(hospital);
-                                Log.d(TAG,"OnHospitalUpdated");
                             }
                         }
                     });
